@@ -5,16 +5,8 @@ function handleLevelChangeEvent(val) {
     obj.remove()
     getData(val);
 }
-function renderNextChunk(direction) {
+function renderChunk() {
     let inputLevel = parseInt(document.getElementById("level").innerText);
-    if(direction == 'forward' && document.getElementById("chunk").innerText != "30") {
-	document.getElementById('chunk').innerText = parseInt(document.getElementById('chunk').innerText) + 1
-
-
-    }
-    if(direction == 'backward' && document.getElementById('chunk').innerText != "0") {
-	document.getElementById('chunk').innerText = parseInt(document.getElementById('chunk').innerText) - 1
-    }
     let val = document.getElementById("chunk").innerText;
     let obj = document.getElementById('chart1');
     obj.remove()
@@ -29,7 +21,9 @@ function renderNextChunk(direction) {
 		}
 	    },
 	    axes: [
-		{},
+		{
+		    space: 60
+		},
 		{
        		    show: true,
        		    label: "Healthy Rat",
@@ -60,7 +54,8 @@ function renderNextChunk(direction) {
 	    width: 1200 + 100,
 	    height: 600,
 	    series: [
-       		{},
+       		{
+		},
        		{
        		    show: true,
        		    spanGaps: false,
@@ -74,6 +69,18 @@ function renderNextChunk(direction) {
 	console.log(json.data);
 	let uplot = new uPlot(opts,json.data, document.getElementById('graph'));
     })
+}
+function renderNextChunk(direction) {
+    let inputLevel = parseInt(document.getElementById("level").innerText);
+    if(direction == 'forward' && document.getElementById("chunk").innerText != document.getElementById("num-chunks").innerText) {
+	document.getElementById('chunk').innerText = parseInt(document.getElementById('chunk').innerText) + 1
+	renderChunk();
+    }
+    if(direction == 'backward' && document.getElementById('chunk').innerText != "0") {
+	document.getElementById('chunk').innerText = parseInt(document.getElementById('chunk').innerText) - 1
+	renderChunk();
+    }
+
 
 }
 function createRadioElement(name, checked, id, lbl, lbl_prefix = 'level', onclick_value = true, root_div = 'levels', child_div = 'radio-fragment') {
@@ -111,11 +118,13 @@ function getData(inputLevel) {
 	    let opts = {
 		scales: {
 		    "x" : {
-       			time: false,
+			time: false
 		    }
 		},
 		axes: [
-		    {},
+		    {
+			space: 60
+		    },
 		    {
        			show: true,
        			label: "Healthy Rat",
@@ -138,7 +147,7 @@ function getData(inputLevel) {
        			    dash: [],
        			    size: 20,
        			}
-		    }
+ 		    }
 		],
 		title: "Healthy Rat Brain Scan",
 		id: "chart1",
@@ -150,14 +159,22 @@ function getData(inputLevel) {
        		    {
        			show: true,
        			spanGaps: false,
+			label: "Data",
        			stroke: "black",
        			width: 1,
        			fill: "rgba(0, 0, 0, 0)",
        			dash: [10, 5],
-       		    }
+       		    },
+
 		],
 	    };
-	    let uplot = new uPlot(opts,json.data, document.getElementById('graph'));
+	    
+	    apoints[json.apoints[0][0]] = json.apoints[1][0];
+	    apoints[json.apoints[0][1]] = json.apoints[1][1];
+	    console.log(apoints);
+	    let vals = json.data;
+	    console.log("VALS -> ", vals);
+	    let uplot = new uPlot(opts,vals,document.getElementById('graph'));
 	    console.log(json.level);
 	    for(let i = 0; i < parseInt(json.num_levels) + 2; i++) {
 		if(i == json.level) createRadioElement('levelRadio', true, '0' + i, i);

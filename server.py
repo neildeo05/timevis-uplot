@@ -5,6 +5,8 @@ app = Flask(__name__)
 CORS(app)
 import os
 import sys
+import csv
+
 def dict_get(dictionary, val ):
     try:
         return dictionary[val]
@@ -22,6 +24,39 @@ def find_level(l, h, max):
     return (count-1, l, h)
 G_MAX_VALUE = 700_000
 
+def get_anomalous_points_for_chunk(chunk):
+    global G_MAX_VALUE
+    points = []
+    if chunk == 0:
+        data_range = (0, G_MAX_VALUE)
+    else:
+        data_range = ((chunk * G_MAX_VALUE) - G_MAX_VALUE, (chunk * G_MAX_VALUE))
+    xs = []
+    ys = []
+    with open('./data/anomalous_points.csv', 'r') as f:
+        a = csv.reader(f, delimiter='\n');
+        for row in a:
+            dat = row[0].split(',')
+            tmp = int(dat[0])
+            if(tmp >= data_range[0] and tmp <= data_range[1]):
+                v = (list(map(int, dat)))
+                xs.append(v[0])
+                ys.append(v[1])
+                          
+    return [xs, ys]
+            
+def get_all_anomalous_points():
+    points = []
+    with open('./data/anomalous_points.csv', 'r') as f:
+        a = csv.reader(f, delimiter='\n');
+        xs = []
+        ys = []
+        for i in a:
+
+            v = list(map(int, i[0].split(',')))
+            xs.append(v[0])
+            ys.append(v[1])
+    return [xs, ys]
 
 @app.route('/getAllData', methods=['POST'])
 def get_all_data():
@@ -35,9 +70,9 @@ def get_all_data():
     ys = []
     dat = []
     num_chunks = 0
-    print(find_level(0, max_x_values, G_MAX_VALUE))
-    for i in range(0, max_x_values, G_MAX_VALUE):
+    for i in range(0, max_x_values // (2 ** level), G_MAX_VALUE):
         num_chunks += 1
+
     with open ("./data/rats_all_levels/level_%02d.csv" % level, 'r') as f:
         for i,j in enumerate(f):
             if(i >= G_MAX_VALUE):
@@ -45,7 +80,28 @@ def get_all_data():
             ys.append(int(j.strip()))
             xs.append((2 ** level) * i)
     dat = [xs,ys]
-    return json.dumps({"num_levels" : find_level(0, max_x_values, G_MAX_VALUE)[0], "level":level, "data": dat, "num_chunks": num_chunks})
+    num_levels = find_level(0, max_x_values, G_MAX_VALUE)[0] + 1
+    print(level, num_levels);
+    if(level == num_levels):
+        return json.dumps(
+            {
+                "num_levels" : num_levels,
+                "level":level,
+                "data": dat,
+                "num_chunks": num_chunks-1,
+                "apoints" : get_all_anomalous_points()
+            }
+        )
+    else:
+        return json.dumps(
+            {
+                "num_levels" : num_levels,
+                "level":level,
+                "data": dat,
+                "num_chunks": num_chunks-1,
+                "apoints" : get_anomalous_points_for_chunk(0)
+            }
+        )
 
 
 @app.route('/getAllDataForChunk', methods=['POST'])
@@ -57,7 +113,7 @@ def get_all_data_for_chunk():
     chunk_number = dict_get(request_json, 'chunk_number')
     level = dict_get(request_json, 'level')
     num_chunks = 0
-    for i in range(0, max_x_values, G_MAX_VALUE):
+    for i in range(0, max_x_values // (2 ** level), G_MAX_VALUE):
         num_chunks += 1
     assert chunk_number < num_chunks
     data_min = G_MAX_VALUE * chunk_number
@@ -78,6 +134,8 @@ def get_all_data_for_chunk():
                 dat.append(int(j.strip()))
     returndata = [xs, dat]
     return json.dumps({"data": returndata})
+    
+    
 
 if __name__ == "__main__":
     app.run(port=8000)
