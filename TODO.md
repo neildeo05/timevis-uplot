@@ -1,6 +1,6 @@
 - [x] Number of pages should correspond to the level
 - [x] Use all numbers in Millions and put the legend on top/bottom (for x axis)
   - KINDA
-- [ ] Show anomalous points
+- [X] Show anomalous points
 - [ ] See if querying range is working out
 - [ ] Work on paper

@@ -168,7 +168,7 @@ function getData(inputLevel) {
 
 		],
 	    };
-	    
+	    let apoints = new Array(json.data[0].length).fill(0)
 	    apoints[json.apoints[0][0]] = json.apoints[1][0];
 	    apoints[json.apoints[0][1]] = json.apoints[1][1];
 	    console.log(apoints);
@@ -176,7 +176,7 @@ function getData(inputLevel) {
 	    console.log("VALS -> ", vals);
 	    let uplot = new uPlot(opts,vals,document.getElementById('graph'));
 	    console.log(json.level);
-	    for(let i = 0; i < parseInt(json.num_levels) + 2; i++) {
+	    for(let i = parseInt(json.num_levels); i >= 0; i--) {
 		if(i == json.level) createRadioElement('levelRadio', true, '0' + i, i);
 		else createRadioElement('levelRadio',false , i, i);
 	    }

@@ -44,6 +44,21 @@ def get_anomalous_points_for_chunk(chunk):
                 ys.append(v[1])
                           
     return [xs, ys]
+
+def query_range(l, h):
+    level, low, high = find_level(l, h)
+    tmp = []
+    with open("./data/level_%02d.csv" % level, 'r') as r:
+        reader = csv.reader(r, delimiter=',')
+        for i, line in enumerate(reader):
+            if i < low:
+                continue
+            elif i > high:
+                break
+            else:
+                tmp.append(int(line[0]))
+        return tmp, level
+
             
 def get_all_anomalous_points():
     points = []
@@ -57,6 +72,23 @@ def get_all_anomalous_points():
             xs.append(v[0])
             ys.append(v[1])
     return [xs, ys]
+
+@app.route('/getRange', methods=['POST'])
+def get_range():
+    global G_MAX_VALUE
+    request_json = json.loads(request.data.decode('utf-8'))
+    plot_type = dict_get(request_json, 'plot_type')
+    max_x_values = int(dict_get(request_json, 'max_x_values'))
+    range_min = int(dict_get(request_json, 'range_min'))
+    range_max = int(dict_get(request_json, 'range_max'))
+    result = query_range(range_min, range_max);
+    return json.dumps({
+        "data": result[0],
+        "level": result[1]
+    })
+    
+
+
 
 @app.route('/getAllData', methods=['POST'])
 def get_all_data():
