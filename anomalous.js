@@ -67,7 +67,7 @@ function renderAnomalousPoints() {
     fetch('http://localhost:8000/getAllData', {
 	method: "POST",
 	body: JSON.stringify({
-	    plot_type: 'rat_healthy',
+	    plot_type: 'rats_all_levels',
 	    max_x_values: 21000000,
 	    level: 5,
 	})
@@ -86,3 +86,72 @@ function renderAnomalousPoints() {
 
 }
 renderAnomalousPoints();
+
+var opts2 = {
+    scales: {
+	"x" : {
+	    time: false
+	}
+    },
+    axes: [
+	{
+	    space: 60
+	},
+	{
+       	    show: true,
+       	    label: "Healthy Rat",
+       	    labelSize: 30,
+       	    labelFont: "bold 12px Arial",
+       	    font: "12px Arial",
+       	    gap: 5,
+       	    size: 100,
+       	    stroke: "black",
+       	    grid: {
+       		show: true,
+       		stroke: "#eee",
+       		width: 2,
+       		dash: [],
+       	    },
+       	    ticks: {
+       		show: true,
+       		stroke: "#eee",
+       		width: 2,
+       		dash: [],
+       		size: 20,
+       	    }
+ 	}
+    ],
+    title: "Anomalous Points Finder",
+    id: "chart1",
+    class: "my-chart",
+    width: 1200 + 100,
+    height: 600,
+    series: [
+       	{},
+       	{
+       	    show: true,
+	    spanGaps: false,
+       	    stroke: "red",
+	    width: 4,
+       	    fill: "rgba(255, 0, 0, 0)",
+       	},
+    ],
+};
+
+
+
+    fetch('http://localhost:8000/getAnomalousZoom', {
+	method: "POST",
+	body: JSON.stringify({
+	    plot_type: 'rats_all_levels',
+	    anomalous_point: 5080,
+	    radius: 10
+	})
+    }).then(res => res.json())
+	.then(json => {
+	    console.log(json);
+	    document.getElementById('chart1').remove()
+	    //TODO: Fix this
+	    let uplot = new uPlot(opts2, json.data, document.getElementById('graph'));
+	})
+

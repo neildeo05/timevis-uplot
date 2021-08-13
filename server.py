@@ -24,7 +24,7 @@ def find_level(l, h, max):
     return (count-1, l, h)
 G_MAX_VALUE = 700_000
 
-def get_anomalous_points_for_chunk(chunk):
+def get_anomalous_points_for_chunk(chunk, dataset):
     global G_MAX_VALUE
     points = []
     if chunk == 0:
@@ -33,7 +33,7 @@ def get_anomalous_points_for_chunk(chunk):
         data_range = ((chunk * G_MAX_VALUE) - G_MAX_VALUE, (chunk * G_MAX_VALUE))
     xs = []
     ys = []
-    with open('./data/anomalous_points.csv', 'r') as f:
+    with open('./data/%s/anomalous_points.csv' % dataset, 'r') as f:
         a = csv.reader(f, delimiter='\n');
         for row in a:
             dat = row[0].split(',')
@@ -48,7 +48,7 @@ def get_anomalous_points_for_chunk(chunk):
 def query_range(l, h):
     level, low, high = find_level(l, h)
     tmp = []
-    with open("./data/level_%02d.csv" % level, 'r') as r:
+    with open("./data/rat_unhealthy_all_levels/level_%02d.csv" % level, 'r') as r:
         reader = csv.reader(r, delimiter=',')
         for i, line in enumerate(reader):
             if i < low:
@@ -60,9 +60,9 @@ def query_range(l, h):
         return tmp, level
 
             
-def get_all_anomalous_points():
+def get_all_anomalous_points(data_source):
     points = []
-    with open('./data/anomalous_points.csv', 'r') as f:
+    with open('./data/%s/anomalous_points.csv' % data_source, 'r') as f:
         a = csv.reader(f, delimiter='\n');
         xs = []
         ys = []
@@ -73,6 +73,37 @@ def get_all_anomalous_points():
             ys.append(v[1])
     return [xs, ys]
 
+@app.route('/getAnomalousZoom', methods=['POST'])
+def get_anomalous_zoom():
+    global G_MAX_VALUE;
+    request_json = json.loads(request.data.decode('utf-8'))
+    plot_type = dict_get(request_json, 'plot_type')
+    anomalous_point = dict_get(request_json, 'anomalous_point')
+    radius = dict_get(request_json, 'radius')
+    xs = []
+    ys = []
+    with open('./data/%s/anomalous_points.csv' % plot_type, 'r') as f:
+        a = csv.reader(f, delimiter='\n');
+        for i in a:
+            v = list(map(int, i[0].split(',')))
+            xs.append(v[0])
+            ys.append(v[1])
+    idx = xs[ys.index(anomalous_point)]
+    minidx = idx - int(radius)
+    maxidx = idx + int(radius)
+    xs = []
+    ys = []
+    with open("./data/%s/level_00.csv" % plot_type,'r') as f:
+        for i,j in enumerate(f):
+            if i >= minidx and i <= maxidx:
+                xs.append(i)
+                ys.append(int(j.strip()))
+    anom_data = [0] * (radius * 2)
+    anom_data[radius] = anomalous_point;
+    return json.dumps({"data": [xs, ys], "anom_data": anom_data})
+    
+        
+    
 @app.route('/getRange', methods=['POST'])
 def get_range():
     global G_MAX_VALUE
@@ -105,13 +136,14 @@ def get_all_data():
     for i in range(0, max_x_values // (2 ** level), G_MAX_VALUE):
         num_chunks += 1
 
-    with open ("./data/rats_all_levels/level_%02d.csv" % level, 'r') as f:
+    with open (("./data/%s/level_%02d.csv" % (plot_type, level)), 'r') as f:
         for i,j in enumerate(f):
             if(i >= G_MAX_VALUE):
                 break
             ys.append(int(j.strip()))
             xs.append((2 ** level) * i)
     dat = [xs,ys]
+    print(len(xs))
     num_levels = find_level(0, max_x_values, G_MAX_VALUE)[0] + 1
     print(level, num_levels);
     if(level == num_levels):
@@ -121,7 +153,7 @@ def get_all_data():
                 "level":level,
                 "data": dat,
                 "num_chunks": num_chunks-1,
-                "apoints" : get_all_anomalous_points()
+                "apoints" : get_all_anomalous_points(plot_type)
             }
         )
     else:
@@ -131,7 +163,7 @@ def get_all_data():
                 "level":level,
                 "data": dat,
                 "num_chunks": num_chunks-1,
-                "apoints" : get_anomalous_points_for_chunk(0)
+                "apoints" : get_anomalous_points_for_chunk(0, plot_type)
             }
         )
 
@@ -154,7 +186,7 @@ def get_all_data_for_chunk():
     dat = []
     xs = []
     test = []
-    with open("./data/rats_all_levels/level_%02d.csv" % level, 'r') as f:
+    with open("./data/%s/level_%02d.csv" % (plot_type,level), 'r') as f:
         for i,j in enumerate(f):
             if (i == data_min):
                 read_mode = True
