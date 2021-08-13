@@ -3,3 +3,4 @@ stylesheets/uPlot.min.css
 uPlot.iife.js
 rat_unhealthy.csv
 
+src/__pycache__/
