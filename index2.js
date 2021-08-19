@@ -12,61 +12,61 @@ function renderChunk() {
     obj.remove()
     fetch('http://localhost:8000/getAllDataForChunk', {
 	method: "POST",
-	body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, chunk_number: parseInt(val), level: inputLevel})
+	body: JSON.stringify({plot_type: 'rat_unhealthy_all_levels', max_x_values: 21000000, chunk_number: parseInt(val), level: inputLevel})
     }).then(res => res.json()).then(json => {
-	let opts = {
-	    scales: {
-		"x" : {
-       		    time: false,
-		}
-	    },
-	    axes: [
-		{
-		    space: 60
+	    let opts = {
+		scales: {
+		    "x" : {
+       			time: false,
+		    }
 		},
-		{
-       		    show: true,
-       		    label: "Healthy Rat",
-       		    labelSize: 30,
-       		    labelFont: "bold 12px Arial",
-       		    font: "12px Arial",
-       		    gap: 5,
-       		    size: 100,
-       		    stroke: "black",
-       		    grid: {
+		axes: [
+		    {
+			space: 60
+		    },
+		    {
        			show: true,
-       			stroke: "#eee",
-       			width: 2,
-       			dash: [],
-       		    },
-       		    ticks: {
+       			label: "Unhealthy Rat",
+       			labelSize: 30,
+       			labelFont: "bold 12px Arial",
+       			font: "12px Arial",
+       			gap: 5,
+       			size: 100,
+       			stroke: "black",
+       			grid: {
+       			    show: true,
+       			    stroke: "#eee",
+       			    width: 2,
+       			    dash: [],
+       			},
+       			ticks: {
+       			    show: true,
+       			    stroke: "#eee",
+       			    width: 2,
+       			    dash: [],
+       			    size: 20,
+       			}
+		    }
+		],
+		title: "Healthy Rat Brain Scan",
+		id: "chart1",
+		class: "my-chart",
+		width: 1200 + 100,
+		height: 600,
+		series: [
+       		    {
+		    },
+       		    {
        			show: true,
-       			stroke: "#eee",
-       			width: 2,
-       			dash: [],
-       			size: 20,
+       			spanGaps: false,
+       			stroke: "black",
+       			width: 1,
+       			fill: "rgba(0, 0, 0, 0)",
        		    }
-		}
-	    ],
-	    title: "Healthy Rat Brain Scan",
-	    id: "chart1",
-	    class: "my-chart",
-	    width: 1200 + 100,
-	    height: 600,
-	    series: [
-       		{
-		},
-       		{
-       		    show: true,
-       		    spanGaps: false,
-       		    stroke: "black",
-       		    width: 1,
-       		    fill: "rgba(0, 0, 0, 0)",
-       		}
-	    ],
-	};
-	let uplot = new uPlot(opts,json.data, document.getElementById('graph'));
-    })
+		],
+	    };
+	    let uplot = new uPlot(opts,json.data, document.getElementById('graph'));
+	})
 }
 function renderNextChunk(direction) {
     let inputLevel = parseInt(document.getElementById("level").innerText);
@@ -106,11 +106,10 @@ function getData(inputLevel) {
     document.getElementById('level').innerText = inputLevel;
     fetch('http://localhost:8000/getAllData', {
 	method: "POST",
-	body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, level: inputLevel})
+	body: JSON.stringify({plot_type: 'rat_unhealthy_all_levels', max_x_values: 21000000, level: inputLevel})
     })
 	.then(res => res.json())
 	.then(json => {
-
 	    document.getElementById('num-levels').innerText = json.num_levels;
 	    document.getElementById('chunk').innerText = 0;
 	    document.getElementById('num-chunks').innerText = json.num_chunks;
@@ -148,7 +147,7 @@ function getData(inputLevel) {
        			}
  		    }
 		],
-		title: "Healthy Rat Brain Scan",
+		title: "Unhealthy Rat Brain Scan",
 		id: "chart1",
 		class: "my-chart",
 		width: 1200 + 100,
@@ -173,6 +172,8 @@ function getData(inputLevel) {
 		else createRadioElement('levelRadio',false , i, i);
 	    }
 	})
+
+
 }
 
 getData(5)

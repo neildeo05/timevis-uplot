@@ -140,18 +140,18 @@ var opts2 = {
 
 
 
-    fetch('http://localhost:8000/getAnomalousZoom', {
-	method: "POST",
-	body: JSON.stringify({
-	    plot_type: 'rats_all_levels',
-	    anomalous_point: 5080,
-	    radius: 10
-	})
-    }).then(res => res.json())
-	.then(json => {
-	    console.log(json);
-	    document.getElementById('chart1').remove()
-	    //TODO: Fix this
-	    let uplot = new uPlot(opts2, json.data, document.getElementById('graph'));
-	})
+    // fetch('http://localhost:8000/getAnomalousZoom', {
+    // 	method: "POST",
+    // 	body: JSON.stringify({
+    // 	    plot_type: 'rats_all_levels',
+    // 	    anomalous_point: 5080,
+    // 	    radius: 10
+    // 	})
+    // }).then(res => res.json())
+    // 	.then(json => {
+    // 	    console.log(json);
+    // 	    document.getElementById('chart1').remove()
+    // 	    //TODO: Fix this
+    // 	    let uplot = new uPlot(opts2, json.data, document.getElementById('graph'));
+    // 	})
 

@@ -199,7 +199,17 @@ def get_all_data_for_chunk():
     returndata = [xs, dat]
     return json.dumps({"data": returndata})
     
-    
+@app.route('/setLabelledAnomalousPoints', methods=['POST'])
+def setLabelledAnomalousPoints():
+    request_json = json.loads(request.data.decode('utf-8'))
+    plot_type = dict_get(request_json, 'plot_type')
+    anom_dat = dict_get(request_json, 'anom_dat')
+    print(anom_dat);
+    with open("./data/%s/user_labelled_anomalous_points.csv" % plot_type, 'w') as f:
+        wp = csv.writer(f, delimiter='\n');
+        wp.writerows(anom_dat)
+
+    return json.dumps({"status": "SUCCESS"})
 
 if __name__ == "__main__":
     app.run(port=8000)
