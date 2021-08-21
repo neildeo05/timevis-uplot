@@ -6,12 +6,41 @@ CORS(app)
 import os
 import sys
 import csv
-
+import time
+import numpy as np
+import pandas as pd
+import io
+import base64
+import timeit
 def dict_get(dictionary, val ):
     try:
         return dictionary[val]
     except:
         return None
+
+def csv_read(fp, delim='\n'):
+    full_data = pd.read_csv(fp, delim)
+    full_data = full_data.to_numpy().astype('int32').flatten()
+    return full_data
+
+def csv_read_inefficient(fp, delim='\n'):
+    tmp = []
+    with open(fp, 'r') as f:
+        reader = csv.reader(f, delimiter='\n')
+        for line in reader:
+            tmp.append(int(line[0]))
+    return tmp[1:]
+
+def serialize_data(data):
+    # memfile = io.BytesIO()
+    # np.save(memfile, data)
+    # memfile.seek(0)
+    # serialized = json.dumps(memfile.read().decode('base64'))
+    serialized = base64.b64encode(data)
+    deserialized = base64.b64decode(serialized)
+    return serialized, deserialized
+
+
     
 def find_level(l, h, max):
     delta = (h-l) + 1
@@ -31,6 +60,7 @@ def get_anomalous_points_for_chunk(chunk, dataset):
         data_range = (0, G_MAX_VALUE)
     else:
         data_range = ((chunk * G_MAX_VALUE) - G_MAX_VALUE, (chunk * G_MAX_VALUE))
+    
     xs = []
     ys = []
     with open('./data/%s/anomalous_points.csv' % dataset, 'r') as f:
@@ -128,24 +158,16 @@ def get_all_data():
     plot_type = dict_get(request_json, 'plot_type')
     max_x_values = int(dict_get(request_json, 'max_x_values'))
     level_raw = dict_get(request_json, 'level')
+    plot_type = 'rats_all_levels'
+    max_x_values = 21_000_000
     level = 0 if not level_raw else int(level_raw)
-    xs = []
-    ys = []
-    dat = []
     num_chunks = 0
+    ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[:G_MAX_VALUE]
+    xs = np.indices(ys.shape)
+    dat = [xs.tolist()[0], ys.tolist()]
+    num_levels = find_level(0, max_x_values, G_MAX_VALUE)[0] + 1
     for i in range(0, max_x_values // (2 ** level), G_MAX_VALUE):
         num_chunks += 1
-
-    with open (("./data/%s/level_%02d.csv" % (plot_type, level)), 'r') as f:
-        for i,j in enumerate(f):
-            if(i >= G_MAX_VALUE):
-                break
-            ys.append(int(j.strip()))
-            xs.append((2 ** level) * i)
-    dat = [xs,ys]
-    print(len(xs))
-    num_levels = find_level(0, max_x_values, G_MAX_VALUE)[0] + 1
-    print(level, num_levels);
     if(level == num_levels):
         return json.dumps(
             {
@@ -167,7 +189,6 @@ def get_all_data():
             }
         )
 
-
 @app.route('/getAllDataForChunk', methods=['POST'])
 def get_all_data_for_chunk():
     global G_MAX_VALUE
@@ -175,6 +196,7 @@ def get_all_data_for_chunk():
     plot_type = dict_get(request_json, 'plot_type')
     max_x_values = dict_get(request_json, 'max_x_values')
     chunk_number = dict_get(request_json, 'chunk_number')
+    print(chunk_number)
     level = dict_get(request_json, 'level')
     num_chunks = 0
     for i in range(0, max_x_values // (2 ** level), G_MAX_VALUE):
@@ -212,4 +234,13 @@ def setLabelledAnomalousPoints():
     return json.dumps({"status": "SUCCESS"})
 
 if __name__ == "__main__":
+    # print("Beginning reads from ./data/rat_unhealthy_all_levels/level_00.csv...\n")
+    # st = time.time()
+    # data = csv_read('./data/rat_unhealthy_all_levels/level_00.csv')
+    # et = time.time()
+    # print(("Efficient read took %f seconds to read %d points. Here is the the first 20 points of the data:\n" % (et - st, data.shape[0])), data[0:20])
+    # st = time.time()
+    # data = csv_read_inefficient('./data/rat_unhealthy_all_levels/level_00.csv')
+    # et = time.time()
+    # print("Inefficient read took %f seconds to read %d points. Here is the first 20 points of the data:\n" % (et - st, len(data)), data[0:20])
     app.run(port=8000)

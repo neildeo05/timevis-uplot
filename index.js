@@ -91,6 +91,7 @@ function createRadioElement(name, checked, id, lbl, lbl_prefix = 'level', onclic
 	radioHtml += ' checked="checked"';
     }
     radioHtml += 'id=' + id;
+    
     radioHtml += ' onclick=handleLevelChangeEvent(this.id)';
 
     radioHtml += `>${lbl_prefix}=${lbl}`;
@@ -110,7 +111,7 @@ function getData(inputLevel) {
     })
 	.then(res => res.json())
 	.then(json => {
-
+	    console.log(json);
 	    document.getElementById('num-levels').innerText = json.num_levels;
 	    document.getElementById('chunk').innerText = 0;
 	    document.getElementById('num-chunks').innerText = json.num_chunks;
@@ -168,8 +169,9 @@ function getData(inputLevel) {
 	    };
 	    let vals = json.data;
 	    let uplot = new uPlot(opts,vals,document.getElementById('graph'));
-	    for(let i = parseInt(json.num_levels); i >= 0; i--) {
-		if(i == json.level) createRadioElement('levelRadio', true, '0' + i, i);
+	    for(let i = 0; i <= parseInt(json.num_levels); i++) {
+//TODO(neil): fix this
+		if(i == json.level) createRadioElement('levelRadio', true, i, i);
 		else createRadioElement('levelRadio',false , i, i);
 	    }
 	})
