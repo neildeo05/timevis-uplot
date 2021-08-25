@@ -20,8 +20,5 @@
 - [x] Number of pages should correspond to the level
 - [x] Use all numbers in Millions and put the legend on top/bottom (for x axis)
 - [X] Show anomalous points
-  - [ ] Zoom into anom point
-- [ ] See if querying range is working out
-- [ ] Plot multiple timeseries
-
-- [ ] Check with dad so i can understand what to do cause im stuck
+- [ ] Zoom into a certain time, and allow move levels with those points
+- [ ] Min/Max on same level
