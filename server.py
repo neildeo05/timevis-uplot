@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 from flask import Flask, request
 from flask_cors import CORS
 import json
@@ -11,7 +12,6 @@ import numpy as np
 import pandas as pd
 import io
 import base64
-import timeit
 def dict_get(dictionary, val ):
     try:
         return dictionary[val]
@@ -31,14 +31,10 @@ def csv_read_inefficient(fp, delim='\n'):
             tmp.append(int(line[0]))
     return tmp[1:]
 
-def serialize_data(data):
-    # memfile = io.BytesIO()
-    # np.save(memfile, data)
-    # memfile.seek(0)
-    # serialized = json.dumps(memfile.read().decode('base64'))
-    serialized = base64.b64encode(data)
-    deserialized = base64.b64decode(serialized)
-    return serialized, deserialized
+# def serialize_data(data):
+#    serialized = base64.b64encode(data)
+#    deserialized = base64.b64decode(serialized)
+#    return serialized, deserialized
 
 
     
@@ -149,6 +145,15 @@ def get_range():
     })
     
 
+#TODO: find a better way to do this cause this is bad code
+def gen_indices(shape, scale_fun=None):
+    t = [None] * shape[0]
+    counter = 0
+    for i in range(0, len(t)-2, 2):
+        t[i] = scale_fun(counter)
+        t[i+1] = t[i]
+        counter+=1
+    return np.array(t[:-1])
 
 
 @app.route('/getAllData', methods=['POST'])
@@ -161,13 +166,18 @@ def get_all_data():
     level = 0 if not level_raw else int(level_raw)
     num_chunks = 0
     ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[:G_MAX_VALUE]
-    scale_fun = lambda x: (2 ** level) * x
+    TODO: xs should be 1/2 scaled (two y values for 1 x value)
     xs = scale_fun(np.indices(ys.shape))
-    dat = [xs.tolist()[0], ys.tolist()]
+    # xs = gen_indices(ys.shape, lambda x: 2 * ((2 ** level) * x))
+    # print(xs)
+    start = time.time()
+    dat = [xs.tolist(), ys.tolist()]
     num_levels = find_level(0, max_x_values, G_MAX_VALUE)[0] + 1
     for i in range(0, max_x_values // (2 ** level), G_MAX_VALUE):
         num_chunks += 1
     if(level == num_levels):
+        end = time.time()
+        print(end - start)
         return json.dumps(
             {
                 "num_levels" : num_levels,
@@ -178,6 +188,8 @@ def get_all_data():
             }
         )
     else:
+        end = time.time()
+        print(end - start)
         return json.dumps(
             {
                 "num_levels" : num_levels,
@@ -205,7 +217,10 @@ def get_all_data_for_chunk():
     ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[data_min:data_max]
     scale_fun = lambda x: (2 ** level) * x
     xs = scale_fun(np.indices(ys.shape))
+    start = time.time()
     dat = [xs.tolist()[0], ys.tolist()]
+    end = time.time()
+    print(end - start)
     return json.dumps({"data": dat})
     
 @app.route('/setLabelledAnomalousPoints', methods=['POST'])
@@ -217,7 +232,6 @@ def setLabelledAnomalousPoints():
     with open("./data/%s/user_labelled_anomalous_points.csv" % plot_type, 'w') as f:
         wp = csv.writer(f, delimiter='\n');
         wp.writerows(anom_dat)
-
     return json.dumps({"status": "SUCCESS"})
 
 if __name__ == "__main__":

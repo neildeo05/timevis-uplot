@@ -9,86 +9,88 @@ function renderChunk() {
     let inputLevel = parseInt(document.getElementById("level").innerText);
     let val = document.getElementById("chunk").innerText;
     let obj = document.getElementById('chart1');
+    console.time('fetch');
     obj.remove()
     fetch('http://localhost:8000/getAllDataForChunk', {
-	method: "POST",
-	body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, chunk_number: parseInt(val), level: inputLevel})
+  method: "POST",
+  body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, chunk_number: parseInt(val), level: inputLevel})
     }).then(res => res.json()).then(json => {
-	let opts = {
-	    scales: {
-		"x" : {
-       		    time: false,
-		}
-	    },
-	    axes: [
-		{
-		    space: 60
-		},
-		{
-       		    show: true,
-       		    label: "Healthy Rat",
-       		    labelSize: 30,
-       		    labelFont: "bold 12px Arial",
-       		    font: "12px Arial",
-       		    gap: 5,
-       		    size: 100,
-       		    stroke: "black",
-       		    grid: {
-       			show: true,
-       			stroke: "#eee",
-       			width: 2,
-       			dash: [],
-       		    },
-       		    ticks: {
-       			show: true,
-       			stroke: "#eee",
-       			width: 2,
-       			dash: [],
-       			size: 20,
-       		    }
-		}
-	    ],
-	    title: "Healthy Rat Brain Scan",
-	    id: "chart1",
-	    class: "my-chart",
-	    width: 1200 + 100,
-	    height: 600,
-	    series: [
-       		{
-		},
-       		{
-       		    show: true,
-       		    spanGaps: false,
-       		    stroke: "black",
-       		    width: 1,
-       		    fill: "rgba(0, 0, 0, 0)",
-       		}
-	    ],
-	};
-	let uplot = new uPlot(opts,json.data, document.getElementById('graph'));
+      console.timeEnd('fetch')
+  let opts = {
+      scales: {
+    "x" : {
+              time: false,
+    }
+      },
+      axes: [
+    {
+        space: 60
+    },
+    {
+              show: true,
+              label: "Healthy Rat",
+              labelSize: 30,
+              labelFont: "bold 12px Arial",
+              font: "12px Arial",
+              gap: 5,
+              size: 100,
+              stroke: "black",
+              grid: {
+            show: true,
+            stroke: "#eee",
+            width: 2,
+            dash: [],
+              },
+              ticks: {
+            show: true,
+            stroke: "#eee",
+            width: 2,
+            dash: [],
+            size: 20,
+              }
+    }
+      ],
+      title: "Healthy Rat Brain Scan",
+      id: "chart1",
+      class: "my-chart",
+      width: 1200 + 100,
+      height: 600,
+      series: [
+          {
+    },
+          {
+              show: true,
+              spanGaps: false,
+              stroke: "black",
+              width: 1,
+              fill: "rgba(0, 0, 0, 0)",
+          }
+      ],
+  };
+  let uplot = new uPlot(opts,json.data, document.getElementById('graph'));
     })
 }
 function renderNextChunk(direction) {
     let inputLevel = parseInt(document.getElementById("level").innerText);
     if(direction == 'forward' && document.getElementById("chunk").innerText != document.getElementById("num-chunks").innerText) {
-	document.getElementById('chunk').innerText = parseInt(document.getElementById('chunk').innerText) + 1
-	renderChunk();
+  document.getElementById('chunk').innerText = parseInt(document.getElementById('chunk').innerText) + 1
+  renderChunk();
     }
     if(direction == 'backward' && document.getElementById('chunk').innerText != "0") {
-	document.getElementById('chunk').innerText = parseInt(document.getElementById('chunk').innerText) - 1
-	renderChunk();
+  document.getElementById('chunk').innerText = parseInt(document.getElementById('chunk').innerText) - 1
+  renderChunk();
     }
 
 
 }
 function createRadioElement(name, checked, id, lbl, lbl_prefix = 'level', onclick_value = true, root_div = 'levels', child_div = 'radio-fragment') {
     if(document.getElementById(child_div) == null) {
-	console.log(root_div);
-	document.getElementById(root_div).innerHTML += `<div id="radio-fragment" style='text-align:right;display:block;float:right;margin:10px;'> </div>`
+  console.log(root_div);
+  document.getElementById(root_div).innerHTML += `<div id="radio-fragment" style='text-align:right;display:block;float:right;margin:10px;'> </div>`
     }
     var radioHtml = '<input type="radio" value=03 name="' + name + '"';
     if (checked) {
-	radioHtml += ' checked="checked"';
+  radioHtml += ' checked="checked"';
     }
     radioHtml += 'id=' + id;
     
@@ -106,75 +108,74 @@ function createRadioElement(name, checked, id, lbl, lbl_prefix = 'level', onclic
 function getData(inputLevel) {
     document.getElementById('level').innerText = inputLevel;
     fetch('http://localhost:8000/getAllData', {
-	method: "POST",
-	body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, level: inputLevel})
+  method: "POST",
+  body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, level: inputLevel})
     })
-	.then(res => res.json())
-	.then(json => {
-	    console.log(json);
-	    document.getElementById('num-levels').innerText = json.num_levels;
-	    document.getElementById('chunk').innerText = 0;
-	    document.getElementById('num-chunks').innerText = json.num_chunks;
-	    let opts = {
-		scales: {
-		    "x" : {
-			time: false
-		    }
-		},
-		axes: [
-		    {
-			space: 60
-		    },
-		    {
-       			show: true,
-       			label: "Healthy Rat",
-       			labelSize: 30,
-       			labelFont: "bold 12px Arial",
-       			font: "12px Arial",
-       			gap: 5,
-       			size: 100,
-       			stroke: "black",
-       			grid: {
-       			    show: true,
-       			    stroke: "#eee",
-       			    width: 2,
-       			    dash: [],
-       			},
-       			ticks: {
-       			    show: true,
-       			    stroke: "#eee",
-       			    width: 2,
-       			    dash: [],
-       			    size: 20,
-       			}
- 		    }
-		],
-		title: "Healthy Rat Brain Scan",
-		id: "chart1",
-		class: "my-chart",
-		width: 1200 + 100,
-		height: 600,
-		series: [
-       		    {},
-       		    {
-       			show: true,
-       			spanGaps: false,
-			label: "Rat healthy",
-       			stroke: "black",
-       			width: 1,
-       			fill: "rgba(0, 0, 0, 0)",
-       		    },
+  .then(res => res.json())
+  .then(json => {
+      console.log(json);
+      document.getElementById('num-levels').innerText = json.num_levels;
+      document.getElementById('chunk').innerText = 0;
+      document.getElementById('num-chunks').innerText = json.num_chunks;
+      let opts = {
+    scales: {
+        "x" : {
+      time: false
+        }
+    },
+    axes: [
+        {
+      space: 60
+        },
+        {
+            show: true,
+            label: "Healthy Rat",
+            labelSize: 30,
+            labelFont: "bold 12px Arial",
+            font: "12px Arial",
+            gap: 5,
+            size: 100,
+            stroke: "black",
+            grid: {
+                show: true,
+                stroke: "#eee",
+                width: 2,
+                dash: [],
+            },
+            ticks: {
+                show: true,
+                stroke: "#eee",
+                width: 2,
+                dash: [],
+                size: 20,
+            }
+        }
+    ],
+    title: "Healthy Rat Brain Scan",
+    id: "chart1",
+    class: "my-chart",
+    width: 1200 + 100,
+    height: 600,
+    series: [
+              {},
+              {
+            show: true,
+            spanGaps: false,
+      label: "Rat healthy",
+            stroke: "black",
+            width: 1,
+            fill: "rgba(0, 0, 0, 0)",
+              },
 
-		],
-	    };
-	    let vals = json.data;
-	    let uplot = new uPlot(opts,vals,document.getElementById('graph'));
-	    for(let i = 0; i <= parseInt(json.num_levels); i++) {
-//TODO(neil): fix this
-		if(i == json.level) createRadioElement('levelRadio', true, i, i);
-		else createRadioElement('levelRadio',false , i, i);
-	    }
-	})
+    ],
+      };
+      let vals = json.data;
+      let uplot = new uPlot(opts,vals,document.getElementById('graph'));
+      for(let i = 0; i <= parseInt(json.num_levels); i++) {
+    if(i == json.level) createRadioElement('levelRadio', true, i, i);
+    else createRadioElement('levelRadio',false , i, i);
+      }
+  })
 }
 
 getData(5)
