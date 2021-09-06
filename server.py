@@ -166,7 +166,8 @@ def get_all_data():
     level = 0 if not level_raw else int(level_raw)
     num_chunks = 0
     ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[:G_MAX_VALUE]
-    TODO: xs should be 1/2 scaled (two y values for 1 x value)
+    #TODO: xs should be 1/2 scaled (two y values for 1 x value)
+    scale_fun = lambda x: (2 ** level) * x
     xs = scale_fun(np.indices(ys.shape))
     # xs = gen_indices(ys.shape, lambda x: 2 * ((2 ** level) * x))
     # print(xs)
