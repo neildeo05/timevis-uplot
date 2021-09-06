@@ -16,6 +16,7 @@ function renderChunk() {
   body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, chunk_number: parseInt(val), level: inputLevel})
     }).then(res => res.json()).then(json => {
       console.timeEnd('fetch')
+      console.log(json);
   let opts = {
       scales: {
     "x" : {

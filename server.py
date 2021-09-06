@@ -31,13 +31,6 @@ def csv_read_inefficient(fp, delim='\n'):
             tmp.append(int(line[0]))
     return tmp[1:]
 
-# def serialize_data(data):
-#    serialized = base64.b64encode(data)
-#    deserialized = base64.b64decode(serialized)
-#    return serialized, deserialized
-
-
-    
 def find_level(l, h, max):
     delta = (h-l) + 1
     count = 0
@@ -165,20 +158,19 @@ def get_all_data():
     level_raw = dict_get(request_json, 'level')
     level = 0 if not level_raw else int(level_raw)
     num_chunks = 0
-    ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[:G_MAX_VALUE]
     #TODO: xs should be 1/2 scaled (two y values for 1 x value)
-    scale_fun = lambda x: (2 ** level) * x
-    xs = scale_fun(np.indices(ys.shape))
-    # xs = gen_indices(ys.shape, lambda x: 2 * ((2 ** level) * x))
-    # print(xs)
-    start = time.time()
+    # scale_fun = lambda x: (2 ** level) * x
+    # xs = scale_fun(np.indices(ys.shape))
+    tmp = []
+    ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[:G_MAX_VALUE]
+    for i in range(ys.shape[0]):
+        tmp.append(2 ** level * (i))
+    xs = np.array(tmp)
     dat = [xs.tolist(), ys.tolist()]
     num_levels = find_level(0, max_x_values, G_MAX_VALUE)[0] + 1
     for i in range(0, max_x_values // (2 ** level), G_MAX_VALUE):
         num_chunks += 1
     if(level == num_levels):
-        end = time.time()
-        print(end - start)
         return json.dumps(
             {
                 "num_levels" : num_levels,
@@ -189,8 +181,6 @@ def get_all_data():
             }
         )
     else:
-        end = time.time()
-        print(end - start)
         return json.dumps(
             {
                 "num_levels" : num_levels,
@@ -216,10 +206,14 @@ def get_all_data_for_chunk():
     data_min = G_MAX_VALUE * chunk_number
     data_max = (G_MAX_VALUE * chunk_number) + G_MAX_VALUE
     ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[data_min:data_max]
-    scale_fun = lambda x: (2 ** level) * x
-    xs = scale_fun(np.indices(ys.shape))
+    tmp = []
+    print(data_min, data_min + ys.shape[0])
+    for i in range(data_min, data_min + ys.shape[0]):
+        tmp.append((2 ** level) * i)
+    xs = np.array(tmp)
+    print(xs)
     start = time.time()
-    dat = [xs.tolist()[0], ys.tolist()]
+    dat = [xs.tolist(), ys.tolist()]
     end = time.time()
     print(end - start)
     return json.dumps({"data": dat})
@@ -236,4 +230,4 @@ def setLabelledAnomalousPoints():
     return json.dumps({"status": "SUCCESS"})
 
 if __name__ == "__main__":
-    app.run(port=8000)
+    app.run(port=8000, debug=True)
