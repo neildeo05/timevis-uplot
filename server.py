@@ -5,6 +5,7 @@ import json
 app = Flask(__name__)
 CORS(app)
 import os
+import subprocess
 import sys
 import csv
 import time
@@ -228,6 +229,7 @@ def setLabelledAnomalousPoints():
         wp = csv.writer(f, delimiter='\n');
         wp.writerows(anom_dat)
     return json.dumps({"status": "SUCCESS"})
-
 if __name__ == "__main__":
+    url = "./templates/index.html"
+    subprocess.call(['open', url])
     app.run(port=8000, debug=True)
