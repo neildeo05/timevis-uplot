@@ -1,4 +1,5 @@
-data/
+data/*
+!data/
 stylesheets/uPlot.min.css
 uPlot.iife.js
 rat_unhealthy.csv

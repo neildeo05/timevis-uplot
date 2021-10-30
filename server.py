@@ -97,7 +97,8 @@ def get_all_anomalous_points(data_source):
 def get_anomalous_zoom():
     global G_MAX_VALUE;
     request_json = json.loads(request.data.decode('utf-8'))
-    plot_type = dict_get(request_json, 'plot_type')
+    # plot_type = dict_get(request_json, 'plot_type')
+    plot_type = 'test_all_levels'
     anomalous_point = dict_get(request_json, 'anomalous_point')
     radius = dict_get(request_json, 'radius')
     xs = []
@@ -128,7 +129,8 @@ def get_anomalous_zoom():
 def get_range():
     global G_MAX_VALUE
     request_json = json.loads(request.data.decode('utf-8'))
-    plot_type = dict_get(request_json, 'plot_type')
+    # plot_type = dict_get(request_json, 'plot_type')
+    plot_type = 'test_all_levels'
     max_x_values = int(dict_get(request_json, 'max_x_values'))
     range_min = int(dict_get(request_json, 'range_min'))
     range_max = int(dict_get(request_json, 'range_max'))
@@ -154,7 +156,8 @@ def gen_indices(shape, scale_fun=None):
 def get_all_data():
     global G_MAX_VALUE
     request_json = json.loads(request.data.decode('utf-8'))
-    plot_type = dict_get(request_json, 'plot_type')
+    # plot_type = dict_get(request_json, 'plot_type')
+    plot_type = 'test_all_levels'
     max_x_values = int(dict_get(request_json, 'max_x_values'))
     level_raw = dict_get(request_json, 'level')
     level = 0 if not level_raw else int(level_raw)
@@ -196,7 +199,8 @@ def get_all_data():
 def get_all_data_for_chunk():
     global G_MAX_VALUE
     request_json = json.loads(request.data.decode('utf-8'))
-    plot_type = dict_get(request_json, 'plot_type')
+    # plot_type = dict_get(request_json, 'plot_type')
+    plot_type = 'test_all_levels'
     max_x_values = dict_get(request_json, 'max_x_values')
     chunk_number = dict_get(request_json, 'chunk_number')
     level = dict_get(request_json, 'level')
@@ -222,7 +226,8 @@ def get_all_data_for_chunk():
 @app.route('/setLabelledAnomalousPoints', methods=['POST'])
 def setLabelledAnomalousPoints():
     request_json = json.loads(request.data.decode('utf-8'))
-    plot_type = dict_get(request_json, 'plot_type')
+    # plot_type = dict_get(request_json, 'plot_type')
+    plot_type = 'test_all_levels'
     anom_dat = dict_get(request_json, 'anom_dat')
     print(anom_dat);
     with open("./data/%s/user_labelled_anomalous_points.csv" % plot_type, 'w') as f:

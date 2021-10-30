@@ -15,6 +15,8 @@
 - [X] Switch over to numpy to get fast load times
 - [X] Min/Max on same level
 - [ ] Zoom into a certain time, and allow move levels with those points
+- [ ] Don't send plot type through REST api - parse from vars.conf
+- [ ] Fix bug with the number of levels for small datasets...
 
 From Christos Faloutsos to Everyone: (4:44 PM) https://www.dropbox.com/sh/13nyfhzr57vnqaa/AACq1eVvq2UWate7N3oJq-uwa?dl=0 gzcat rat_healthy_int.data.gz | wc -l  175,459,328 gzcat rat_seizure_int.data.gz | wc -l  175,705,856
 
