@@ -6,6 +6,7 @@ from datetime import datetime
 from tqdm import trange
 import os.path
 import argparse
+import isolation_forests as isf
 parser = argparse.ArgumentParser()
 # arg = parse('COMPRESS_MODE')
 # fullpath_for_data = parse("SOURCE_FILE").split('.')[0] + "_" + arg + "_levels"
@@ -49,7 +50,8 @@ def write(root, levels):
 
 if __name__ == "__main__":
     # filename = "../" + parse("SOURCE_DIR") + "/" + parse("SOURCE_FILE")
-    if not os.path.isdir(datadir):
+
+    if not os.path.isdir("../" + datadir):
         os.mkdir(datadir)
     filename = '%s/%s' % (datadir, args.filename)
     raw_data = read_csv(filename)
@@ -64,3 +66,10 @@ if __name__ == "__main__":
     root = build_tree(raw_data)
     write(*root)
     os.chdir("../../src")
+    anomalies = (isf.find_anomalies(filename, 6))
+    print(anomalies)
+    anom_file = "%s/%s/anomalous_points.csv" % (datadir, fullpath_for_data)
+    print(anom_file)
+    with open(anom_file, 'w+') as f:
+       csv_writer = csv.writer(f, delimiter = ',')
+       # csv_writer.writerow(anomalies)

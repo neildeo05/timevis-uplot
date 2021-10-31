@@ -185,8 +185,8 @@ def get_all_data():
                 "num_levels" : num_levels,
                 "level":level,
                 "data": dat,
-                "num_chunks": num_chunks-1
-                # "apoints" : get_all_anomalous_points(plot_type)
+                "num_chunks": num_chunks-1,
+                "apoints" : get_all_anomalous_points(plot_type)
             }
         )
     else:
@@ -195,8 +195,8 @@ def get_all_data():
                 "num_levels" : num_levels,
                 "level":level,
                 "data": dat,
-                "num_chunks": num_chunks-1
-                # "apoints" : get_anomalous_points_for_chunk(0, plot_type)
+                "num_chunks": num_chunks-1,
+                "apoints" : get_anomalous_points_for_chunk(0, plot_type)
             }
         )
 
