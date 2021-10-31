@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3.7
 from flask import Flask, request
 from flask_cors import CORS
 import json

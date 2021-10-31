@@ -1,7 +1,5 @@
 data/*
 !data/
-stylesheets/uPlot.min.css
-uPlot.iife.js
 rat_unhealthy.csv
 rat_healthy_int_data.csv
 
