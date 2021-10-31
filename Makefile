@@ -1,5 +1,5 @@
-PYTHONCC=python
-PIPCC=pip
+PYTHONCC=python3
+PIPCC=pip3
 SRCDIR=./src
 DATADIR= ./data
 DATAFILE= test.csv
