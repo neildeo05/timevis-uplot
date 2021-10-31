@@ -1,14 +1,19 @@
 import csv
 import backend
 import os
-from confparser import parse, setopt
 import sys
 from datetime import datetime
 from tqdm import trange
 import os.path
-arg = parse('COMPRESS_MODE')
-fullpath_for_data = parse("SOURCE_FILE").split('.')[0] + "_" + arg + "_levels"
-
+import argparse
+parser = argparse.ArgumentParser()
+# arg = parse('COMPRESS_MODE')
+# fullpath_for_data = parse("SOURCE_FILE").split('.')[0] + "_" + arg + "_levels"
+parser.add_argument('-d', "--decompress_arg", type=str, help='decompress argument for preprocessing', default='all')
+parser.add_argument('-f', '--filename', type=str, help='filename for preprocessing', default='test.csv')
+parser.add_argument('-s', '--sourcedatadir', type=str, help='source data dir for preprocessing', default='data')
+args = parser.parse_args()
+arg = args.decompress_arg
 if arg == 'all':
     arg = backend.Decompress_Arg.ALL
 elif arg == 'min':
@@ -16,6 +21,8 @@ elif arg == 'min':
 else:
     arg = backend.Decompress_Arg.MAX
 
+fullpath_for_data = args.filename.split('.')[0] + '_' + args.decompress_arg + "_levels"
+datadir = '../' + args.sourcedatadir
 def read_csv(filename):
     # Open file as IO object
     with open(filename, 'r') as csv_file:
@@ -41,10 +48,13 @@ def write(root, levels):
 
 
 if __name__ == "__main__":
-    filename = "../" + parse("SOURCE_DIR") + "/" + parse("SOURCE_FILE")
+    # filename = "../" + parse("SOURCE_DIR") + "/" + parse("SOURCE_FILE")
+    if not os.path.isdir(datadir):
+        os.mkdir(datadir)
+    filename = '%s/%s' % (datadir, args.filename)
     raw_data = read_csv(filename)
     print("READ FILE %s" % filename)
-    os.chdir("../data")
+    os.chdir(datadir)
     if not os.path.isdir(fullpath_for_data):
         os.mkdir(fullpath_for_data)
         

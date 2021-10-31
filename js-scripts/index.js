@@ -110,7 +110,7 @@ function getData(inputLevel) {
     document.getElementById('level').innerText = inputLevel;
     fetch('http://localhost:8000/getAllData', {
   method: "POST",
-  body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, level: inputLevel})
+  body: JSON.stringify({plot_type: 'test_all_levels', max_x_values: 1000, level: inputLevel})
     })
   .then(res => res.json())
   .then(json => {
@@ -172,9 +172,9 @@ function getData(inputLevel) {
       };
       let vals = json.data;
       let uplot = new uPlot(opts,vals,document.getElementById('graph'));
-      for(let i = 0; i <= parseInt(json.num_levels); i++) {
-    if(i == json.level) createRadioElement('levelRadio', true, i, i);
-    else createRadioElement('levelRadio',false , i, i);
+      for(let i = 0; i <= 5; i++) {
+	  if(i == json.level) createRadioElement('levelRadio', true, i, i);
+	  else createRadioElement('levelRadio',false , i, i);
       }
   })
 }

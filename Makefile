@@ -1,10 +1,15 @@
+PYTHONCC=python
+PIPCC=pip
 SRCDIR=./src
+DATADIR= ./data
+DATAFILE= test.csv
 demo: install preprocess plot
+
 install:
-	pip install -r requirements.txt;\
+	$(PIPCC) install --user -r requirements.txt
 
 preprocess:
-	cd $(SRCDIR); python preprocess.py; cd ..
+	cd $(SRCDIR); $(PYTHONCC) preprocess.py --filename=$(DATAFILE) --sourcedatadir=$(DATADIR); cd ..
 
 plot:
-	python server.py
+	cd $(SRCDIR); $(PYTHONCC) server.py --sourcedatadir=$(DATADIR); cd ..

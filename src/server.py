@@ -13,6 +13,11 @@ import numpy as np
 import pandas as pd
 import io
 import base64
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', '--sourcedatadir', type=str, help='source data dir for preprocessing', default='data')
+args = parser.parse_args()
+
 def dict_get(dictionary, val ):
     try:
         return dictionary[val]
@@ -53,7 +58,7 @@ def get_anomalous_points_for_chunk(chunk, dataset):
     
     xs = []
     ys = []
-    with open('./data/%s/anomalous_points.csv' % dataset, 'r') as f:
+    with open('../data/%s/anomalous_points.csv' % dataset, 'r') as f:
         a = csv.reader(f, delimiter='\n');
         for row in a:
             dat = row[0].split(',')
@@ -68,7 +73,7 @@ def get_anomalous_points_for_chunk(chunk, dataset):
 def query_range(l, h):
     level, low, high = find_level(l, h)
     tmp = []
-    with open("./data/rat_unhealthy_all_levels/level_%02d.csv" % level, 'r') as r:
+    with open("../data/test_all_levels/level_%02d.csv" % level, 'r') as r:
         reader = csv.reader(r, delimiter=',')
         for i, line in enumerate(reader):
             if i < low:
@@ -82,7 +87,7 @@ def query_range(l, h):
             
 def get_all_anomalous_points(data_source):
     points = []
-    with open('./data/%s/anomalous_points.csv' % data_source, 'r') as f:
+    with open('../data/%s/anomalous_points.csv' % data_source, 'r') as f:
         a = csv.reader(f, delimiter='\n');
         xs = []
         ys = []
@@ -103,7 +108,7 @@ def get_anomalous_zoom():
     radius = dict_get(request_json, 'radius')
     xs = []
     ys = []
-    with open('./data/%s/anomalous_points.csv' % plot_type, 'r') as f:
+    with open('../data/%s/anomalous_points.csv' % plot_type, 'r') as f:
         a = csv.reader(f, delimiter='\n');
         for i in a:
             v = list(map(int, i[0].split(',')))
@@ -114,7 +119,7 @@ def get_anomalous_zoom():
     maxidx = idx + int(radius)
     xs = []
     ys = []
-    with open("./data/%s/level_00.csv" % plot_type,'r') as f:
+    with open("../data/%s/level_00.csv" % plot_type,'r') as f:
         for i,j in enumerate(f):
             if i >= minidx and i <= maxidx:
                 xs.append(i)
@@ -166,7 +171,7 @@ def get_all_data():
     # scale_fun = lambda x: (2 ** level) * x
     # xs = scale_fun(np.indices(ys.shape))
     tmp = []
-    ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[:G_MAX_VALUE]
+    ys = csv_read("../%s/%s/level_%02d.csv" % (args.sourcedatadir, plot_type, level))[:G_MAX_VALUE]
     for i in range(ys.shape[0]):
         tmp.append(2 ** level * (i))
     xs = np.array(tmp)
@@ -180,8 +185,8 @@ def get_all_data():
                 "num_levels" : num_levels,
                 "level":level,
                 "data": dat,
-                "num_chunks": num_chunks-1,
-                "apoints" : get_all_anomalous_points(plot_type)
+                "num_chunks": num_chunks-1
+                # "apoints" : get_all_anomalous_points(plot_type)
             }
         )
     else:
@@ -190,8 +195,8 @@ def get_all_data():
                 "num_levels" : num_levels,
                 "level":level,
                 "data": dat,
-                "num_chunks": num_chunks-1,
-                "apoints" : get_anomalous_points_for_chunk(0, plot_type)
+                "num_chunks": num_chunks-1
+                # "apoints" : get_anomalous_points_for_chunk(0, plot_type)
             }
         )
 
@@ -210,7 +215,7 @@ def get_all_data_for_chunk():
     assert chunk_number < num_chunks
     data_min = G_MAX_VALUE * chunk_number
     data_max = (G_MAX_VALUE * chunk_number) + G_MAX_VALUE
-    ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[data_min:data_max]
+    ys = csv_read("../%s/%s/level_%02d.csv" % (args.sourcedatadir, plot_type, level))[data_min:data_max]
     tmp = []
     print(data_min, data_min + ys.shape[0])
     for i in range(data_min, data_min + ys.shape[0]):
@@ -230,11 +235,9 @@ def setLabelledAnomalousPoints():
     plot_type = 'test_all_levels'
     anom_dat = dict_get(request_json, 'anom_dat')
     print(anom_dat);
-    with open("./data/%s/user_labelled_anomalous_points.csv" % plot_type, 'w') as f:
+    with open("../data/%s/user_labelled_anomalous_points.csv" % plot_type, 'w') as f:
         wp = csv.writer(f, delimiter='\n');
         wp.writerows(anom_dat)
     return json.dumps({"status": "SUCCESS"})
 if __name__ == "__main__":
-    url = "./templates/index.html"
-    subprocess.call(['open', url])
-    app.run(port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True)
