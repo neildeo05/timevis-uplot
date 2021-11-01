@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # filename = "../" + parse("SOURCE_DIR") + "/" + parse("SOURCE_FILE")
 
     if not os.path.isdir("../" + datadir):
-        os.mkdir(datadir)
+        os.mkdir("../" + datadir)
     filename = '%s/%s' % (datadir, args.filename)
     raw_data = read_csv(filename)
     print("READ FILE %s" % filename)
