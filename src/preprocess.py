@@ -66,10 +66,8 @@ if __name__ == "__main__":
     root = build_tree(raw_data)
     write(*root)
     os.chdir("../../src")
-    anomalies = (isf.find_anomalies(filename, 6))
-    print(anomalies)
+    # anomalies = (isf.find_anomalies(filename, 6))
     anom_file = "%s/%s/anomalous_points.csv" % (datadir, fullpath_for_data)
-    print(anom_file)
     with open(anom_file, 'w+') as f:
-       csv_writer = csv.writer(f, delimiter = ',')
+        pass
        # csv_writer.writerow(anomalies)
