@@ -5,6 +5,7 @@ DATADIR= ./data
 DATAFILE= test.csv
 
 all: install preprocess plot
+
 plot:
 	cd $(SRCDIR); $(PYTHONCC) server.py --sourcedatadir=$(DATADIR); cd ..
 
