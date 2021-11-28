@@ -64,6 +64,7 @@ if __name__ == "__main__":
     print(os.getcwd())
 
     root = build_tree(raw_data)
+    print("Finish Building Tree")
     write(*root)
     os.chdir("../../src")
     # anomalies = (isf.find_anomalies(filename, 6))
