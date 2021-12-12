@@ -4,7 +4,7 @@ SRCDIR=./src
 DATADIR= ./data
 DATAFILE= test.csv
 
-all: install preprocess plot
+all: install preprocess plot clean
 
 plot:
 	cd $(SRCDIR); $(PYTHONCC) server.py --sourcedatadir=$(DATADIR); cd ..
@@ -14,3 +14,6 @@ preprocess:
 
 install:
 	$(PIPCC) install --user -r requirements.txt
+
+clean:
+	cd $(DATADIR); rm -rf test_all_levels
