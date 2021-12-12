@@ -1,4 +1,5 @@
 *.swp
 src/__pycache__/
 build.py
-test.csv
+./data/big.csv
+

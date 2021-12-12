@@ -4,7 +4,7 @@ SRCDIR=./src
 DATADIR= ./data
 DATAFILE= test.csv
 
-all: install preprocess plot clean
+all: preprocess plot clean
 
 plot:
 	cd $(SRCDIR); $(PYTHONCC) server.py --sourcedatadir=$(DATADIR); cd ..
