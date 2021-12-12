@@ -1,74 +1,65 @@
-import csv
-import backend
+from io import TextIOWrapper
 import os
-import sys
-from datetime import datetime
-from tqdm import trange
-import os.path
 import argparse
-import isolation_forests as isf
-parser = argparse.ArgumentParser()
-# arg = parse('COMPRESS_MODE')
-# fullpath_for_data = parse("SOURCE_FILE").split('.')[0] + "_" + arg + "_levels"
+import time
+import sys
+parser = argparse.ArgumentParser() 
 parser.add_argument('-d', "--decompress_arg", type=str, help='decompress argument for preprocessing', default='all')
 parser.add_argument('-f', '--filename', type=str, help='filename for preprocessing', default='test.csv')
 parser.add_argument('-s', '--sourcedatadir', type=str, help='source data dir for preprocessing', default='data')
 args = parser.parse_args()
-arg = args.decompress_arg
-if arg == 'all':
-    arg = backend.Decompress_Arg.ALL
-elif arg == 'min':
-    arg = backend.Decompress_Arg.MIN
-else:
-    arg = backend.Decompress_Arg.MAX
+inputFilePath = args.filename
+datadir = args.sourcedatadir
+decomp_arg = args.decompress_arg
+# TODO: Don't hardcode this
+size = 100_000_000
 
-fullpath_for_data = args.filename.split('.')[0] + '_' + args.decompress_arg + "_levels"
-datadir = '../' + args.sourcedatadir
-def read_csv(filename):
-    # Open file as IO object
-    with open(filename, 'r') as csv_file:
-        # Initialize csv_reader with the IO object of the file passed in as a parameter
-        csv_reader = csv.reader(csv_file, delimiter = '\n')
-        # The csv_reader is iterable, so list(csv_reader) turns the data of the file into a list and returns it.
-        # In order to return a list of ints, the items in the list have to be converted to ints, so map(int, list) does that
-        # return list(map(int, list(csv_reader)))
-        return list(map(lambda x: int(x[0]), list(csv_reader)))
-
-def build_tree(data):
-    # This function converts the raw_data (of type list) into a hierarchy (tree/graph)
-    return backend.query_select_data(data)
-
-def write(root, levels):
-    tmp = root
-    basename = "level_%02d.csv"
-    for i in trange(levels+2, desc = "Level:"):
-        with open(basename % i, 'w') as csv_file:
-            csv_writer = csv.writer(csv_file, delimiter = ',')
-            csv_writer.writerows(backend.convert_node_array_to_list(tmp.layer,arg))
-        tmp = tmp.next
-
+tic = time.perf_counter()
+topFourList = [None] * 4
+total:int = 0
+fourCounter:int = 0
 
 if __name__ == "__main__":
-    # filename = "../" + parse("SOURCE_DIR") + "/" + parse("SOURCE_FILE")
-
+    # TODO: This has to work based on the Data directory
+    fullpath_for_data = args.filename.split('.')[0] + ("_%s_levels" % decomp_arg)
     if not os.path.isdir("../" + datadir):
         os.mkdir("../" + datadir)
-    filename = '%s/%s' % (datadir, args.filename)
-    raw_data = read_csv(filename)
-    print("READ FILE %s" % filename)
-    os.chdir(datadir)
+    os.chdir("../" + datadir)
     if not os.path.isdir(fullpath_for_data):
         os.mkdir(fullpath_for_data)
-        
+    else:
+        cont = input("Directory %s already exists. Should I overwrite this? [y]/N " % fullpath_for_data)
+        if cont == 'y' or cont == '':
+            print("TO BE IMPLEMENTED SOON")
+            sys.exit(1);
+        else:
+            sys.exit(1);
     os.chdir(fullpath_for_data)
-    print(os.getcwd())
 
-    root = build_tree(raw_data)
-    print("Finish Building Tree")
-    write(*root)
-    os.chdir("../../src")
-    # anomalies = (isf.find_anomalies(filename, 6))
+    #TODO: Work with the Data directory
+    for i in range(7):
+        basename = "level_%02d.csv"
+        writeTo: TextIOWrapper = open(basename %i,'w')
+        with open ('../'+inputFilePath if i == 0 else basename % (i-1), "r") as myFile:
+            myNum = myFile.readline()
+            while (myNum):  
+                total += 1
+                topFourList[fourCounter] = myNum
+                fourCounter += 1
+                if len(topFourList) == 4 and None not in topFourList:
+                     minNum = min(topFourList)
+                     maxNum = max(topFourList)
+                     writeTo.writelines([minNum,maxNum])
+                     fourCounter = 0
+                     topFourList = [None] * 4
+                if (total % 1_000_000 == 0):
+                    print("reached: ", total)
+                    toc = time.perf_counter()
+                    print(f"Took {toc - tic:0.4f} seconds")
+                myNum = myFile.readline()
+        writeTo.close()
+
     anom_file = "%s/%s/anomalous_points.csv" % (datadir, fullpath_for_data)
     with open(anom_file, 'w+') as f:
-        pass
-       # csv_writer.writerow(anomalies)
+        print("CREATED FILE")
+
