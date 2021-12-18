@@ -8,6 +8,7 @@ parser.add_argument('-d', "--decompress_arg", type=str, help='decompress argumen
 parser.add_argument('-f', '--filename', type=str, help='filename for preprocessing', default='test.csv')
 parser.add_argument('-s', '--sourcedatadir', type=str, help='source data dir for preprocessing', default='data')
 args = parser.parse_args()
+print(args.filename)
 inputFilePath = args.filename
 datadir = args.sourcedatadir
 decomp_arg = args.decompress_arg
@@ -21,26 +22,20 @@ fourCounter:int = 0
 
 if __name__ == "__main__":
     # TODO: This has to work based on the Data directory
-    fullpath_for_data = args.filename.split('.')[0] + ("_%s_levels" % decomp_arg)
+    fullpath_for_data = args.filename.split('.')[0] + ("_preprocess_levels")
     if not os.path.isdir("../" + datadir):
         os.mkdir("../" + datadir)
     os.chdir("../" + datadir)
     if not os.path.isdir(fullpath_for_data):
         os.mkdir(fullpath_for_data)
-    else:
-        cont = input("Directory %s already exists. Should I overwrite this? [y]/N " % fullpath_for_data)
-        if cont == 'y' or cont == '':
-            print("TO BE IMPLEMENTED SOON")
-            sys.exit(1);
-        else:
-            sys.exit(1);
     os.chdir(fullpath_for_data)
 
     #TODO: Work with the Data directory
     for i in range(7):
         basename = "level_%02d.csv"
         writeTo: TextIOWrapper = open(basename %i,'w')
-        with open ('../'+inputFilePath if i == 0 else basename % (i-1), "r") as myFile:
+        print(os.getcwd())
+        with open ("../../../" + inputFilePath if i == 0 else basename % (i-1), "r") as myFile:
             myNum = myFile.readline()
             while (myNum):  
                 total += 1
@@ -58,8 +53,4 @@ if __name__ == "__main__":
                     print(f"Took {toc - tic:0.4f} seconds")
                 myNum = myFile.readline()
         writeTo.close()
-
-    anom_file = "%s/%s/anomalous_points.csv" % (datadir, fullpath_for_data)
-    with open(anom_file, 'w+') as f:
-        print("CREATED FILE")
 

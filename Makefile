@@ -6,11 +6,12 @@ DATAFILE= test.csv
 
 all: clean preprocess plot
 
-plot:
+plot: 
 	cd $(SRCDIR); $(PYTHONCC) server.py --sourcedatadir=$(DATADIR); cd ..
 
 preprocess:
-	cd $(SRCDIR); $(PYTHONCC) preprocess.py --filename=$(DATAFILE) --sourcedatadir=$(DATADIR); cd ..
+	cd $(SRCDIR); $(PYTHONCC) preprocess.py --filename=$(DATAFILE) --sourcedatadir=$(DATADIR); cd ..;
+	cd $(DATADIR); cd test_all_levels; touch anomalous_points.csv;
 
 install:
 	$(PIPCC) install --user -r requirements.txt
