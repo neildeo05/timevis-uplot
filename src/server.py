@@ -1,4 +1,5 @@
 #! /usr/bin/env python3.7
+import sys
 from flask import Flask, request
 from flask_cors import CORS
 import json
@@ -6,7 +7,6 @@ app = Flask(__name__)
 CORS(app)
 import os
 import subprocess
-import sys
 import csv
 import time
 import numpy as np

@@ -3,6 +3,7 @@ import os
 import argparse
 import time
 import sys
+
 parser = argparse.ArgumentParser() 
 parser.add_argument('-d', "--decompress_arg", type=str, help='decompress argument for preprocessing', default='all')
 parser.add_argument('-f', '--filename', type=str, help='filename for preprocessing', default='test.csv')
@@ -22,10 +23,10 @@ fourCounter:int = 0
 
 if __name__ == "__main__":
     # TODO: This has to work based on the Data directory
-    fullpath_for_data = args.filename.split('.')[0] + ("_preprocess_levels")
-    if not os.path.isdir("../" + datadir):
-        os.mkdir("../" + datadir)
-    os.chdir("../" + datadir)
+    fullpath_for_data = args.filename.split('.')[0] + ("_preprocessed_levels")
+    if not os.path.isdir(datadir):
+        os.mkdir(datadir)
+    os.chdir(datadir)
     if not os.path.isdir(fullpath_for_data):
         os.mkdir(fullpath_for_data)
     os.chdir(fullpath_for_data)
@@ -34,8 +35,8 @@ if __name__ == "__main__":
     for i in range(7):
         basename = "level_%02d.csv"
         writeTo: TextIOWrapper = open(basename %i,'w')
-        print(os.getcwd())
-        with open ("../../../" + inputFilePath if i == 0 else basename % (i-1), "r") as myFile:
+        print("Creating %s"%(basename%i))
+        with open ("../../" + inputFilePath if i == 0 else basename % (i-1), "r") as myFile:
             myNum = myFile.readline()
             while (myNum):  
                 total += 1
@@ -53,4 +54,5 @@ if __name__ == "__main__":
                     print(f"Took {toc - tic:0.4f} seconds")
                 myNum = myFile.readline()
         writeTo.close()
+
 
