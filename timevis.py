@@ -23,10 +23,10 @@ if args.install:
         print("already installed required packages... skipping step")
     else:
         try:
-            subprocess.run(['pip', 'install', '-r', 'requirements.txt'])
+            subprocess.run(['pip3', 'install', '-r', 'requirements.txt'])
             subprocess.run(['cp', 'requirements.txt', 'installed_packages.txt'])
         except Exception as e:
-            subprocess.run(['pip', 'install','-U', '-r', 'requirements.txt'])
+            subprocess.run(['pip3', 'install','-U', '-r', 'requirements.txt'])
             subprocess.run(['cp', 'requirements.txt', 'installed_packages.txt'])
 
 
