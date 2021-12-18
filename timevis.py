@@ -54,22 +54,22 @@ if not exists(data_path) and not force:
 if not force:
     try:
         subprocess.run(['open', './templates/index.html'])
-        print("+ python plot.py")
+        print("+ python3 plot.py")
         server.run(base_data_path)
     except Exception as e:
-        print("+ python plot.py")
+        print("+ python3 plot.py")
         print("open this link in your browser: file://%s/templates/index.html" % os.getcwd())
         server.run(base_data_path)
 
 else:
-    print('+ python preprocess.py')
-    subprocess.run(['python', './src/preprocess.py', '--filename=%s'%args.filename])
+    print('+ python3 preprocess.py')
+    subprocess.run(['python3', './src/preprocess.py', '--filename=%s'%args.filename])
     subprocess.run(['touch', data_path + '/anomalous_points.csv'])
     try:
         subprocess.run(['open', './templates/index.html'])
-        print("+ python plot.py")
+        print("+ python3 plot.py")
         server.run(base_data_path)
     except Exception as e:
-        print("+ python plot.py")
+        print("+ python3 plot.py")
         print("open this link in your browser: file://%s/templates/index.html" % os.getcwd())
         server.run(base_data_path)
