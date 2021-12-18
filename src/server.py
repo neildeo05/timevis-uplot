@@ -42,7 +42,7 @@ def find_level(l, h, max):
         delta = (h - l) + 1
         count+=1
     return (count-1, l, h)
-G_MAX_VALUE = 700000
+G_MAX_VALUE = 1000000
 
 def get_anomalous_points_for_chunk(chunk, dataset):
     global G_MAX_VALUE

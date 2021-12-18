@@ -10,6 +10,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--filename", type=str, help='CSV File that timevis will run on')
 parser.add_argument('--force', type=str, help='[y/n] If true, the preprocessor will overwrite previously preprocessed files, otherwise. If false, the preprocessor will not run, and will immediately handoff to the plotter')
 parser.add_argument('--install', type=str, help='[y/n] If true, all packages in requirements.txt will be installed, if necessary')
+parser.add_argument('--python3', type=str, help='[y/n] If true, python3 will be used by default', default='y')
+parser.add_argument('--pip3', type=str, help='[y/n] If true, pip3 will be used by default', default='y')
+parser.add_argument('--userpip', type=str, help='[y/n] If true, the -U flag will be added to pip', default='n')
 
 
 if len(sys.argv) < 3:
@@ -17,16 +20,22 @@ if len(sys.argv) < 3:
     parser.exit(1)
 
 args = parser.parse_args()
+python = 'python'
+pip = 'pip'
+if args.python3:
+    python = 'python3'
+if args.pip3:
+    pip = 'pip3'
 
-if args.install:
+if args.install == 'y' or args.install == 'Y':
     if (filecmp.cmp('requirements.txt', 'installed_packages.txt')):
         print("already installed required packages... skipping step")
     else:
-        try:
-            subprocess.run(['pip3', 'install', '-r', 'requirements.txt'])
+        if args.userpip=='y' or args.userpip=='Y':
+            subprocess.run([pip, 'install','-U', '-r', 'requirements.txt'])
             subprocess.run(['cp', 'requirements.txt', 'installed_packages.txt'])
-        except Exception as e:
-            subprocess.run(['pip3', 'install','-U', '-r', 'requirements.txt'])
+        else:
+            subprocess.run([pip, 'install', '-r', 'requirements.txt'])
             subprocess.run(['cp', 'requirements.txt', 'installed_packages.txt'])
 
 
@@ -54,16 +63,16 @@ if not exists(data_path) and not force:
 if not force:
     try:
         subprocess.run(['open', './templates/index.html'])
-        print("+ python3 plot.py")
+        print("+ python plot.py")
         server.run(base_data_path)
     except Exception as e:
-        print("+ python3 plot.py")
+        print("+ python plot.py")
         print("open this link in your browser: file://%s/templates/index.html" % os.getcwd())
         server.run(base_data_path)
 
 else:
     print('+ python3 preprocess.py')
-    subprocess.run(['python3', './src/preprocess.py', '--filename=%s'%args.filename])
+    subprocess.run([python, './src/preprocess.py', '--filename=%s'%args.filename])
     subprocess.run(['touch', data_path + '/anomalous_points.csv'])
     try:
         subprocess.run(['open', './templates/index.html'])
