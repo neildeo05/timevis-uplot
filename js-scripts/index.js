@@ -13,7 +13,7 @@ function renderChunk() {
     obj.remove()
     fetch('http://localhost:8000/getAllDataForChunk', {
   method: "POST",
-  body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 21000000, chunk_number: parseInt(val), level: inputLevel})
+  body: JSON.stringify({plot_type: 'rats_all_levels', max_x_values: 10_000_000, chunk_number: parseInt(val), level: inputLevel})
     }).then(res => res.json()).then(json => {
       console.timeEnd('fetch')
       console.log(json);
@@ -110,13 +110,15 @@ function getData(inputLevel) {
     document.getElementById('level').innerText = inputLevel;
     fetch('http://localhost:8000/getAllData', {
   method: "POST",
-  body: JSON.stringify({plot_type: 'test_all_levels', max_x_values: 1000, level: inputLevel})
+  body: JSON.stringify({plot_type: 'test_all_levels', max_x_values: 10_000_000, level: inputLevel})
     })
   .then(res => res.json())
   .then(json => {
       console.log(json);
       document.getElementById('num-levels').innerText = json.num_levels;
       document.getElementById('chunk').innerText = 0;
+      console.log("JSON NUM_CHUNKS");
+      console.log(json.num_chunks);
       document.getElementById('num-chunks').innerText = json.num_chunks;
       let opts = {
     scales: {
@@ -172,11 +174,11 @@ function getData(inputLevel) {
       };
       let vals = json.data;
       let uplot = new uPlot(opts,vals,document.getElementById('graph'));
-      for(let i = 0; i <= 5; i++) {
+      for(let i = 0; i <= 4; i++) {
 	  if(i == json.level) createRadioElement('levelRadio', true, i, i);
 	  else createRadioElement('levelRadio',false , i, i);
       }
   })
 }
 
-getData(5)
+getData(4)

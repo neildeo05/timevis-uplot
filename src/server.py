@@ -42,7 +42,7 @@ def find_level(l, h, max):
         delta = (h - l) + 1
         count+=1
     return (count-1, l, h)
-G_MAX_VALUE = 1000000
+G_MAX_VALUE = 1_000_000
 
 def get_anomalous_points_for_chunk(chunk, dataset):
     global G_MAX_VALUE
@@ -175,16 +175,21 @@ def get_all_data():
         tmp.append(2 ** level * (i))
     xs = np.array(tmp)
     dat = [xs.tolist(), ys.tolist()]
+    len_of_vals=len(dat[0])
+
     num_levels = find_level(0, max_x_values, G_MAX_VALUE)[0] + 1
-    for i in range(0, max_x_values // (2 ** level), G_MAX_VALUE):
-        num_chunks += 1
+
+    num_chunks = (max_x_values // G_MAX_VALUE) // (level+1)
+    if level == 4:
+        num_chunks -= 1
+    print("BC", max_x_values, len_of_vals, num_chunks)
     if(level == num_levels):
         return json.dumps(
             {
                 "num_levels" : num_levels,
                 "level":level,
                 "data": dat,
-                "num_chunks": num_chunks-1,
+                "num_chunks": num_chunks - 1,
                 "apoints" : get_all_anomalous_points(plot_type)
             }
         )
@@ -194,7 +199,7 @@ def get_all_data():
                 "num_levels" : num_levels,
                 "level":level,
                 "data": dat,
-                "num_chunks": num_chunks-1,
+                "num_chunks": num_chunks - 1,
                 "apoints" : get_anomalous_points_for_chunk(0, plot_type)
             }
         )
