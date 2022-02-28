@@ -4,8 +4,14 @@
     <title>Timevis</title>
     <link rel="stylesheet" href="../stylesheets/uPlot.min.css">
     <link rel="stylesheet" href="../stylesheets/styles.css">
+    <style>
+      .uplot .u-cursor-pt {
+	  pointer-events: auto !important;
+      }
+    </style>
   </head>
   <body>
+
     <p class="Same">Number Of levels: </p>
     <p class="Same" id='num-levels'></p>
     <p class="Same">&emsp;&emsp;&emsp;Number Of pages: </p>
@@ -14,6 +20,10 @@
     <p class="Same" id='chunk'></p>
     <p class="Same">&emsp;&emsp;&emsp;Level#: </p>
     <p class="Same" id='level'></p>
+    <p class="Same">&emsp;&emsp;&emsp;Centering on: </p>
+    <p class="Same" id="myUL"></p>
+    <span id = 'foo'></span>
+
     
     <div id='levels'>
       <div id="radio-fragment" style='text-align:right;display:block;float:right;margin:10px;'> </div>
@@ -21,6 +31,7 @@
 
     <div id='graph'>
     </div>
+
     <div id='nextPrevButtons'>
       <button onclick='renderNextChunk(`backward`)'> Backward </button>
       <button style='float:right;' onclick='renderNextChunk(`forward`)'> Forward </button>

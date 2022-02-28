@@ -328,7 +328,21 @@
 	  absolute: true,
       };
 
-      fetch("data/rustc-perf.json", state).then(r => r.json()).then(prepData).then(data => renderPlots(data, state));
+      // fetch("data/rustc-perf.json", state)
+        // .then(r => r.json())
+    // .then(prepData).then(data => renderPlots(data, state));
+      const data = {
+	userId: 1,
+	id: 1,
+	title: "delectus aut autem",
+	  completed: false,
+	  benchmarks: [1,2,3,4],
+	  commits: [1,2,3,4,5]
+	  
+	  
+      }
+      prepData(data);
+      renderPlots(data, state)
     </script>
   </body>
 </html>

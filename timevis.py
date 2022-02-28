@@ -7,7 +7,7 @@ from os.path import exists
 import src.server as server
 import filecmp
 parser = argparse.ArgumentParser()
-parser.add_argument("--filename", type=str, help='CSV File that timevis will run on')
+parser.add_argument("--filename", type=str, help='CSV File that timevis will run on.')
 parser.add_argument('--force', type=str, help='[y/n] If true, the preprocessor will overwrite previously preprocessed files, otherwise. If false, the preprocessor will not run, and will immediately handoff to the plotter')
 parser.add_argument('--install', type=str, help='[y/n] If true, all packages in requirements.txt will be installed, if necessary')
 parser.add_argument('--python3', type=str, help='[y/n] If true, python3 will be used by default', default='y')
@@ -39,8 +39,7 @@ if args.install == 'y' or args.install == 'Y':
             subprocess.run(['cp', 'requirements.txt', 'installed_packages.txt'])
 
 
-
-if not exists(args.filename):
+elif not exists(args.filename):
     print('ERROR: filename `%s` does not exist.' % args.filename)
     parser.print_help()
     parser.exit(1)

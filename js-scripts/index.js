@@ -1,21 +1,31 @@
 let currentChunk = 0;
 let maxLevel = 4;
+let G_MAX_VALUE = 1_000_000;
 function handleLevelChangeEvent(val) {
     console.log('Handling Level Change Event');
 //TODO: Fix bug that messes up level for lower levels (just run it and test and you'll see it)
-    if (val == maxLevel) {
-	currentChunk = 0;
-    }
+
     console.log(`Current chunk = ${currentChunk}`);
     let obj = document.getElementById('chart1');
     obj.remove()
     obj = document.getElementById('radio-fragment');
     obj.remove()
-    if (currentChunk != 0) {
+    let center = document.getElementById("myUL").innerText
+    
+    center = center.substr(1, center.length - 1)
+    center = parseInt(center.split(',')[0])
+    let computed_chunk = parseInt(center / G_MAX_VALUE)
+    console.log("CENTERING POINT = ", computed_chunk);
+
+    console.log(center);
+    if (center) {
 	document.getElementById('level').innerText = val;
-	console.log(`Current chunk compute: ${Math.floor(currentChunk/(val+1))}, cuz val = ${parseInt(val) + 1}, and currentChunk = ${currentChunk}`);
-	console.log(`currentChunk/val = ${currentChunk/(val + 1)}`)
-	document.getElementById('chunk').innerText = Math.floor(currentChunk/(parseInt(val)+1));
+	if (val != maxLevel) {
+	    document.getElementById('chunk').innerText = Math.floor(computed_chunk/(parseInt(val)+1));
+	}
+	else {
+	    document.getElementById('chunk').innerText=0;
+	}
 	renderChunk()
 	for(let i = 0; i <= 4; i++) {
 	    if(i == val) createRadioElement('levelRadio', true, i, i);
@@ -200,12 +210,37 @@ function getData(inputLevel) {
 		],
 	    };
 	    let vals = json.data;
+
+	    let dat = []
 	    let uplot = new uPlot(opts,vals,document.getElementById('graph'));
+	    let pts = Array.from(uplot.root.querySelectorAll(".u-cursor-pt"));
 	    for(let i = 0; i <= 4; i++) {
 		if(i == json.level) createRadioElement('levelRadio', true, i, i);
 		else createRadioElement('levelRadio',false , i, i);
 	    }
+	    pts.forEach((pt, i) => {
+		pt.onclick = e => {
+		    
+  		  const seriesIdx = i+1;
+		  const dataIdx = uplot.cursor.idx;
+		  const xVal = uplot.data[        0][dataIdx];
+		  const yVal = uplot.data[seriesIdx][dataIdx];
+		    dat.push([xVal, yVal]);
+		    document.getElementById("myUL").innerHTML = `(${xVal}, ${yVal}) `
+		    var span = document.getElementById('foo');
+		    var txt = document.createTextNode("\u00D7");
+		    span.className = "close";
+		    span.appendChild(txt);
+		    
+		    span.onclick = function() {
+			document.getElementById('myUL').innerText = null;
+			document.getElementById('foo').innerText = null;
+		    }
+		  
+		}
+	    })
 	})
 }
+
 
 getData(maxLevel);

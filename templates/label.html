@@ -45,12 +45,12 @@
 		  },
 	      ],
 	      cursor: {
-		  y: false
+		  y: true
 	      }
 
 	  };
-	  opts.cursor.y = false;
-	  opts.cursor.x = false;
+	  opts.cursor.y = true;
+	  opts.cursor.x = true;
 
 	  let u = new uPlot(opts, data, document.getElementById("graph"));
 
@@ -95,8 +95,6 @@
 		      close[i].onclick = function() {
 			  var div = this.parentElement;
 			  div.style.display = "none";
-			  // dat.splice(dat.indexOf(
-			  //TODO: Remove div value from array once x button is clicked
 			  console.log(div.innerText)
 		      }
 		  }
