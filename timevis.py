@@ -8,6 +8,7 @@ import src.server as server
 import filecmp
 parser = argparse.ArgumentParser()
 parser.add_argument("--filename", type=str, help='CSV File that timevis will run on.')
+parser.add_argument("--center_radius_mode", type=str, help='[y/n] Should timevis run in center radius mode, or normal mode')
 parser.add_argument('--force', type=str, help='[y/n] If true, the preprocessor will overwrite previously preprocessed files, otherwise. If false, the preprocessor will not run, and will immediately handoff to the plotter')
 parser.add_argument('--install', type=str, help='[y/n] If true, all packages in requirements.txt will be installed, if necessary')
 parser.add_argument('--python3', type=str, help='[y/n] If true, python3 will be used by default', default='y')
@@ -61,9 +62,14 @@ if not exists(data_path) and not force:
 
 if not force:
     try:
-        subprocess.run(['open', './templates/index.html'])
-        print("+ python plot.py")
-        server.run(base_data_path)
+        if args.center_radius_mode == 'n' or args.center_radius_mode == 'N':
+            subprocess.run(['open', './templates/index.html'])
+            print("+ python plot.py")
+            server.run(base_data_path)
+        else:
+            subprocess.run(['open', './templates/center-range.html'])
+            print("+ python plot.py")
+            server.run(base_data_path)
     except Exception as e:
         print("+ python plot.py")
         print("open this link in your browser: file://%s/templates/index.html" % os.getcwd())
@@ -74,9 +80,15 @@ else:
     subprocess.run([python, './src/preprocess.py', '--filename=%s'%args.filename])
     subprocess.run(['touch', data_path + '/anomalous_points.csv'])
     try:
-        subprocess.run(['open', './templates/index.html'])
-        print("+ python3 plot.py")
-        server.run(base_data_path)
+        if args.center_radius_mode == 'n' or args.center_radius_mode == 'N':
+            subprocess.run(['open', './templates/index.html'])
+            print("+ python plot.py")
+            server.run(base_data_path)
+        else:
+            subprocess.run(['open', './templates/center-range.html'])
+            print("+ python plot.py")
+            server.run(base_data_path)
+
     except Exception as e:
         print("+ python3 plot.py")
         print("open this link in your browser: file://%s/templates/index.html" % os.getcwd())

@@ -32,7 +32,7 @@ def csv_read_inefficient(fp, delim='\n'):
         for line in reader:
             tmp.append(int(line[0]))
     return tmp[1:]
-
+G_MAX_VALUE = 1_000_000
 def find_level(l, h, max):
     delta = (h-l) + 1
     count = 0
@@ -41,8 +41,10 @@ def find_level(l, h, max):
         l //= 2
         delta = (h - l) + 1
         count+=1
+    if count == 0:
+        return (0, l, h)
     return (count-1, l, h)
-G_MAX_VALUE = 1_000_000
+
 
 def get_anomalous_points_for_chunk(chunk, dataset):
     global G_MAX_VALUE
@@ -68,7 +70,12 @@ def get_anomalous_points_for_chunk(chunk, dataset):
 
 def query_range(l, h):
     global datadir
-    level, low, high = find_level(l, h)
+    low, high =l, h
+    level = 0
+    # Scale back down based on level
+    # print(level, low, high)
+    # low = low // (2 ** level)
+    # high = high // (2 ** level)
     tmp = []
     with open("./data/%s/level_%02d.csv" % (datadir, level), 'r') as r:
         reader = csv.reader(r, delimiter=',')
@@ -90,7 +97,6 @@ def get_all_anomalous_points(data_source):
         xs = []
         ys = []
         for i in a:
-
             v = list(map(int, i[0].split(',')))
             xs.append(v[0])
             ys.append(v[1])
@@ -138,9 +144,14 @@ def get_range():
     max_x_values = int(dict_get(request_json, 'max_x_values'))
     range_min = int(dict_get(request_json, 'range_min'))
     range_max = int(dict_get(request_json, 'range_max'))
+    
     result = query_range(range_min, range_max);
+    tmp = []
+    for i in range(range_min, range_max):
+        tmp.append(i)
+    xs = np.array(tmp)
     return json.dumps({
-        "data": result[0],
+        "data": [xs.tolist(), result[0]],
         "level": result[1]
     })
     
@@ -173,6 +184,8 @@ def get_all_data():
     ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[:G_MAX_VALUE]
     for i in range(ys.shape[0]):
         tmp.append(2 ** level * (i))
+    # for i in range(ys.shape[0]):
+        # tmp.append(i)
     xs = np.array(tmp)
     dat = [xs.tolist(), ys.tolist()]
     len_of_vals=len(dat[0])
