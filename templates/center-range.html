@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="../stylesheets/styles.css">
   </head>
   <body>
-    <p id='foo'>Centering on: </p>
-    <p id='bar'>Current Level: 6</p>
+    <h1> Timevis Center-Radius Mode</h1>
+    <h3 id='foo'>Centering on: </h3>
+    <h3 id='bar'>Current Level: 6</h3>
   <script src="../js-scripts/uPlot.iife.js"></script>
   <script>
 
@@ -18,17 +19,11 @@
 	body: JSON.stringify({plot_type: 'test_all_levels', max_x_values: 10_000_000, level: 6})
     }).then(res => res.json())
     .then(json => {
-	// const data = [
-	//     [ 1, 2, 3, 4, 5, 6, 7, 9,10],
-	//     [40,43,60,65,71,73,40,22,20],
-	//     [30,23,35,27,11,13,30,32,30],
-	//     [15,13,39,17,21,53,10,11,13],
-	// ];
 	const data = json.data
+	console.log(data)
 	const opts = {
 	    width: 1300,
 	    height: 600,
-
 	    cursor: {
 		drag: {
 		    setScale: false,
@@ -42,7 +37,7 @@
 		},
 		{
 		    show: true,
-		    label: "Healthy Rat",
+		    label: "Amplitude",
 		    labelSize: 30,
 		    labelFont: "bold 12px Arial",
 		    font: "12px Arial",
@@ -72,15 +67,19 @@
 	    series: [
 		{},
 		{
-		    stroke: "black"
-		}
+		    label: "lows",
+		    stroke: "red"
+		},
+		{
+		    label:" highs", 
+		    stroke: "blue"
+		 },
 	    ],
 	    hooks: {
 		init: [
 		    u => {
 			u.over.ondblclick = e => {
 			    console.log("Fetching data for full range");
-				// <h1 id='bar'>Current Level: </h1>
 			    document.getElementById('bar').innerText = "Current Level: 6";
 			    u.setData(data);
 			}
@@ -94,16 +93,10 @@
 			console.log("Fetching data for range...", {min, max});
 			console.log("Centering on..." , Math.floor(Math.ceil(max - min) / 2));
 			document.getElementById('foo').innerText = `Centering on: ${ Math.ceil(min) + Math.floor(Math.floor(Math.ceil(max - min) / 2))}`
-			// let foo = Math.pow(2, 6) * Math.ceil(min);
-			// let bar = Math.pow(2, 6) * Math.ceil(max);
-			// if (foo > 10000000 || bar > 10000000) {
-			//     foo = min
-			//     bar = max
-			// }
+
 			fetch('http://localhost:8000/getRange', {
 			    method: "POST",
-			    //TODO: Math.pow should be on serve
-			    body: JSON.stringify({plot_type: 'test_all_levels', max_x_values: 10_000_000, range_min: min, range_max: max})
+			    body: JSON.stringify({plot_type: '', max_x_values: 10_000_000, range_min: min, range_max: max})
 			}).then(res => res.json())
 			    .then(json2 => {
 				console.log(json2)
@@ -111,15 +104,7 @@
 				console.log(json2.level);
 				document.getElementById('bar').innerText = `Current Level: ${json2.level}`;
 			    })
-			
-		
-			// set new data
 
-
-			// zoom to selection
-			// u.setScale('x', {min, max});
-
-			// reset selection
 			u.setSelect({width: 0, height: 0}, false);
 		    }
 		]

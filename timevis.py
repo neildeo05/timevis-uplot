@@ -14,7 +14,8 @@ parser.add_argument('--install', type=str, help='[y/n] If true, all packages in 
 parser.add_argument('--python3', type=str, help='[y/n] If true, python3 will be used by default', default='y')
 parser.add_argument('--pip3', type=str, help='[y/n] If true, pip3 will be used by default', default='y')
 parser.add_argument('--userpip', type=str, help='[y/n] If true, the -U flag will be added to pip', default='n')
-
+parser.add_argument('--average', type=str, help='[y/n] If true, the preprocess mode will be set to average', default='n')
+# TODO: Add support for averages
 
 if len(sys.argv) < 3:
     parser.print_help()

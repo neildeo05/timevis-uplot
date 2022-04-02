@@ -68,25 +68,6 @@ def get_anomalous_points_for_chunk(chunk, dataset):
                           
     return [xs, ys]
 
-def query_range(l, h):
-    global datadir
-    low, high =l, h
-    level = 0
-    # Scale back down based on level
-    # print(level, low, high)
-    # low = low // (2 ** level)
-    # high = high // (2 ** level)
-    tmp = []
-    with open("./data/%s/level_%02d.csv" % (datadir, level), 'r') as r:
-        reader = csv.reader(r, delimiter=',')
-        for i, line in enumerate(reader):
-            if i < low:
-                continue
-            elif i > high:
-                break
-            else:
-                tmp.append(int(line[0]))
-        return tmp, level
 
             
 def get_all_anomalous_points(data_source):
@@ -132,9 +113,50 @@ def get_anomalous_zoom():
     anom_data = [0] * (radius * 2)
     anom_data[radius] = anomalous_point;
     return json.dumps({"data": [xs, ys], "anom_data": anom_data})
-    
+
+def read_separated(datadir, level_tmp, low_scaled, high_scaled):
+    lows = []
+    highs = []
+    tmp = []
+    with open("./data/%s/level_%02d.csv" % (datadir, level_tmp), 'r') as r:
+        reader = csv.reader(r, delimiter=',')
+        for i, line in enumerate(reader):
+            if i < low_scaled:
+                continue
+            elif i > high_scaled:
+                break
+            else:
+                if i % 2 == 0:
+                    lows.append(int(line[0]))
+                else:
+                    highs.append(int(line[0]))
+        tmp.append(lows)
+        tmp.append(highs)
+    return tmp
         
-    
+def query_range(l, h):
+    global datadir
+    low, high = l, h
+   # Centering on a specific level:
+   # between 2 million and 3 million timeticks
+   # necessary data should be encapsulated from [2 million / (level+1), 3 million/(level+1)]
+    # coarsest_data_bounds = (low // (2 ** 7),  high // (2 ** 7)) # Should bet the data range at the highest level
+    # coarsest_data_range = int(coarsest_data_bounds[1] - coarsest_data_bounds[0]);
+    # level = 0
+    level = 0 # If the range is 1_000_000, then you go down by one level. If the range is 500_000 then you go down by 2 levels. If the range is 250,000
+    # TODO: Populate this depending on a larger set of levels (maybe for very very large series >1B)
+    raw_level = int(1_000_000 // int(high - low)) 
+    #TODO:  refactor
+    level_tmp = 6 - (raw_level if raw_level <= 6 else 6)
+    if level_tmp == 6:
+        level_tmp = 5
+    level_scaled = 2 ** level_tmp
+    low_scaled = low//level_scaled
+    high_scaled = high//level_scaled
+    print(low_scaled, high_scaled)
+    tmp = read_separated(datadir, level_tmp, low_scaled, high_scaled)
+    return tmp, level_tmp, low_scaled, high_scaled
+
 @app.route('/getRange', methods=['POST'])
 def get_range():
     global G_MAX_VALUE, datadir
@@ -146,12 +168,13 @@ def get_range():
     range_max = int(dict_get(request_json, 'range_max'))
     
     result = query_range(range_min, range_max);
+    level = result[1]
     tmp = []
-    for i in range(range_min, range_max):
-        tmp.append(i)
-    xs = np.array(tmp)
+    for i in range(result[-2], result[-1], 2):
+        tmp.append(2 ** level * (i))
+
     return json.dumps({
-        "data": [xs.tolist(), result[0]],
+        "data": [tmp, result[0][0], result[0][1]],
         "level": result[1]
     })
     
@@ -181,17 +204,22 @@ def get_all_data():
     # scale_fun = lambda x: (2 ** level) * x
     # xs = scale_fun(np.indices(ys.shape))
     tmp = []
+    lows = []
+    highs = []
     ys = csv_read("./data/%s/level_%02d.csv" % (plot_type, level))[:G_MAX_VALUE]
-    for i in range(ys.shape[0]):
-        tmp.append(2 ** level * (i))
-    # for i in range(ys.shape[0]):
-        # tmp.append(i)
-    xs = np.array(tmp)
-    dat = [xs.tolist(), ys.tolist()]
+    for i,j in enumerate(ys.tolist()):
+        if i % 2 == 0:
+            lows.append(j)
+        else:
+            highs.append(j)
+    tmp.append(lows)
+    tmp.append(highs)
+    xs = []
+    for i in range(0, ys.shape[0], 2):
+        xs.append(2 ** level * (i))
+    dat = [xs, tmp[0], tmp[1]]
     len_of_vals=len(dat[0])
-
     num_levels = find_level(0, max_x_values, G_MAX_VALUE)[0] + 1
-
     num_chunks = (max_x_values // G_MAX_VALUE) // (level+1)
     if level == 4:
         num_chunks -= 1

@@ -5,12 +5,18 @@ import argparse
 import time
 import sys
 
+
 _DEBUG=False
+
+
+
 parser = argparse.ArgumentParser() 
 parser.add_argument('-d', "--decompress_arg", type=str, help='decompress argument for preprocessing', default='all')
 parser.add_argument('-f', '--filename', type=str, help='filename for preprocessing', default='test.csv')
 parser.add_argument('-s', '--sourcedatadir', type=str, help='source data dir for preprocessing', default='data')
+parser.add_argument('-a', '--averagemode', type=str, help='Average or Min/Max Mode', default='minmax')
 args = parser.parse_args()
+average_mode = args.averamgemode
 print(args.filename)
 inputFilePath = args.filename
 datadir = args.sourcedatadir
@@ -49,12 +55,13 @@ if __name__ == "__main__":
                 topFourList[fourCounter] = intMyNum
                 fourCounter += 1
                 if len(topFourList) == 4 and None not in topFourList:
-                     minNum = min(topFourList)
-                     maxNum = max(topFourList)
-                     if _DEBUG and i == 4:
-                         print("Level 3's top four => ", topFourList)
-                         print("Mins and Maxes => ", minNum, maxNum)
-                     writeTo.writelines([str(minNum) + '\n',str(maxNum) + '\n'])
+                    if average_mode:
+                        average = (sum(topFourList)) // len(topFourList)
+                        writeTo.writelines([str(average) + '\n'])
+                    else:
+                        minNum = min(topFourList)
+                        maxNum = max(topFourList)
+                        writeTo.writelines([str(minNum) + '\n',str(maxNum) + '\n'])
                      fourCounter = 0
                      topFourList = [None] * 4
                 if (total % 1_000_000 == 0):

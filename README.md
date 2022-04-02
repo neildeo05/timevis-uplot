@@ -13,3 +13,7 @@
 If you want to use a different file instead of `test.csv`, rename the current `test.csv` to `test_old.csv`, and rename your file to `test.csv`. Move that file to the `data` directory
 
 Run `make preprocess` to preprocess this file. This will take a long time.
+
+
+- [ ] Incremental zoom (don't zoom all the way into level 0)
+- [ ] Separate the min/max into different timeseries (don't display them on the same tick)
