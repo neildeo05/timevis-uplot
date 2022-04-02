@@ -1,5 +1,5 @@
 Flask==2.0.0
 flask-cors
 numpy
-pandas
+pandas==1.0.1
 argparse
