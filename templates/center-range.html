@@ -11,6 +11,7 @@
     <h1> Timevis Center-Radius Mode</h1>
     <h3 id='foo'>Centering on: </h3>
     <h3 id='bar'>Current Level: 6</h3>
+    <p> The current level indicates how much much the timeseries has been compressed by. The larger the level, the more coarse the visualization is</p>
   <script src="../js-scripts/uPlot.iife.js"></script>
   <script>
 
@@ -67,11 +68,11 @@
 	    series: [
 		{},
 		{
-		    label: "lows",
+		    label: "highs",
 		    stroke: "red"
 		},
 		{
-		    label:" highs", 
+		    label: "lows", 
 		    stroke: "blue"
 		 },
 	    ],

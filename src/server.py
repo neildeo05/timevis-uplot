@@ -145,7 +145,7 @@ def query_range(l, h):
     # level = 0
     level = 0 # If the range is 1_000_000, then you go down by one level. If the range is 500_000 then you go down by 2 levels. If the range is 250,000
     # TODO: Populate this depending on a larger set of levels (maybe for very very large series >1B)
-    raw_level = int(1_000_000 // int(high - low)) 
+    raw_level = int(5_000_000 // int(high - low)) 
     #TODO:  refactor
     level_tmp = 6 - (raw_level if raw_level <= 6 else 6)
     if level_tmp == 6:
@@ -174,7 +174,7 @@ def get_range():
         tmp.append(2 ** level * (i))
 
     return json.dumps({
-        "data": [tmp, result[0][0], result[0][1]],
+        "data": [tmp,result[0][1], result[0][0]],
         "level": result[1]
     })
     
