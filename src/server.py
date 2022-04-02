@@ -21,7 +21,7 @@ def dict_get(dictionary, val ):
         return None
 
 def csv_read(fp, delim='\n'):
-    full_data = pd.read_csv(fp, delim)
+    full_data = pd.read_csv(fp, delim, quoting=csv.QUOTE_NONE)
     full_data = full_data.to_numpy().astype('int32').flatten()
     return full_data
 
