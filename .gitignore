@@ -3,3 +3,4 @@ src/__pycache__/
 build.py
 ./data/big.csv
 test.csv
+PYENV_INSTRUCTIONS
