@@ -15,5 +15,5 @@ If you want to use a different file instead of `test.csv`, rename the current `t
 Run `make preprocess` to preprocess this file. This will take a long time.
 
 
-- [ ] Incremental zoom (don't zoom all the way into level 0)
-- [ ] Separate the min/max into different timeseries (don't display them on the same tick)
+- [X] Incremental zoom (don't zoom all the way into level 0)
+- [X] Separate the min/max into different timeseries (don't display them on the same tick)
