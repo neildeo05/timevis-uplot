@@ -4,3 +4,4 @@ build.py
 ./data/big.csv
 test.csv
 PYENV_INSTRUCTIONS
+.python-version
