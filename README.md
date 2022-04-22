@@ -2,18 +2,8 @@
 
 # Installation Instructions
 
-1. Clone the repository at https://github.com/neildeo05/timevis-uplot, or at git@github.com:neildeo05/timevis-uplot.git
-2. When you first clone the repository, you can run `make all` to install the packages, preprocess the demo file, and plot on the browser
-3. After that, in order to plot without installing and preprocessing, run `make plot`
+1. Clone the repository at <https://github.com/neildeo05/timevis-uplot>, or at <git@github.com:neildeo05/timevis-uplot.git>
+2. In order to run the demo, run the `build.sh` executable.
+  - Note that if you don't want to run python3, you can pass in the environment variable `SYSTEM_PYTHON=1`
+3. You can also run `python3 timevis.py` to see all of the other options
 
-
-
-# Using a different file
-
-If you want to use a different file instead of `test.csv`, rename the current `test.csv` to `test_old.csv`, and rename your file to `test.csv`. Move that file to the `data` directory
-
-Run `make preprocess` to preprocess this file. This will take a long time.
-
-
-- [X] Incremental zoom (don't zoom all the way into level 0)
-- [X] Separate the min/max into different timeseries (don't display them on the same tick)
