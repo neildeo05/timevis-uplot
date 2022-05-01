@@ -100,9 +100,15 @@
 			    body: JSON.stringify({plot_type: '', max_x_values: 10_000_000, range_min: min, range_max: max})
 			}).then(res => res.json())
 			    .then(json2 => {
-				console.log(json2)
-				u.setData(json2.data);
-				console.log(json2.level);
+          if (json2.level == 0) {
+            console.log("IM HERE");
+            console.log(json2.data);
+                u.setData([json2.data[0], json2.data[1], json2.data[1]])
+          }
+          else{
+            u.setData(json2.data);
+                console.log(json2.data);
+          }
 				document.getElementById('bar').innerText = `Current Level: ${json2.level}`;
 			    })
 

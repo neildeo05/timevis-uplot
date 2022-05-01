@@ -134,6 +134,31 @@ def read_separated(datadir, level_tmp, low_scaled, high_scaled):
         tmp.append(lows)
         tmp.append(highs)
     return tmp
+
+def read_avg(datadir, level_tmp, low_scaled, high_scaled):
+    lows = []
+    highs = []
+    with open("./data/%s/level_%02d.csv" % (datadir, level_tmp), 'r') as r:
+        reader = csv.reader(r, delimiter=',')
+        for i, line in enumerate(reader):
+            if i < low_scaled:
+                continue
+            elif i > high_scaled:
+                break
+            else:
+                if i % 2 == 0:
+                    lows.append(int(line[0]))
+                else:
+                    highs.append(int(line[0]))
+
+    tmp = []
+    val = len(lows)
+    if len(lows) > len(highs):
+        val = len(highs)
+    for i in range(val):
+        tmp.append((lows[i] + highs[i]) // 2)
+    return tmp
+
         
 def query_range(l, h):
     global datadir
@@ -154,8 +179,11 @@ def query_range(l, h):
     level_scaled = 2 ** level_tmp
     low_scaled = low//level_scaled
     high_scaled = high//level_scaled
-    print(low_scaled, high_scaled)
-    tmp = read_separated(datadir, level_tmp, low_scaled, high_scaled)
+    if level_tmp == 0:
+        tmp = read_avg(datadir, level_tmp, low_scaled, high_scaled)
+        print(tmp)
+    else:
+        tmp = read_separated(datadir, level_tmp, low_scaled, high_scaled)
     return tmp, level_tmp, low_scaled, high_scaled
 
 @app.route('/getRange', methods=['POST'])
@@ -170,14 +198,24 @@ def get_range():
     
     result = query_range(range_min, range_max);
     level = result[1]
-    tmp = []
-    for i in range(result[-2], result[-1], 2):
-        tmp.append(2 ** level * (i))
+    if level == 0:
+        tmp = []
+        for i in range(result[-2], result[-1], 2):
+            tmp.append(2 ** level * (i))
+        return json.dumps({
+            "data": [tmp, result[0]],
+            "level": result[1]
+        })
+    else:
+        tmp = []
+        for i in range(result[-2], result[-1], 2):
+            tmp.append(2 ** level * (i))
 
-    return json.dumps({
-        "data": [tmp,result[0][1], result[0][0]],
-        "level": result[1]
-    })
+        return json.dumps({
+            "data": [tmp,result[0][1], result[0][0]],
+            # "data_full": 
+            "level": result[1]
+        })
     
 
 #TODO: find a better way to do this cause this is bad code
