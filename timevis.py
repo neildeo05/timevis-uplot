@@ -78,7 +78,10 @@ if not force:
 
 else:
     print('+ python3 preprocess.py')
-    subprocess.run([python, './src/preprocess.py', '--filename=%s'%args.filename])
+    if args.average:
+        subprocess.run([python, './src/preprocess.py', '--filename=%s'%args.filename, '--averagemode="y"'])
+    else:
+        subprocess.run([python, './src/preprocess.py', '--filename=%s'%args.filename, '--averagemode="n"'])
     subprocess.run(['touch', data_path + '/anomalous_points.csv'])
     try:
         if args.center_radius_mode == 'n' or args.center_radius_mode == 'N':

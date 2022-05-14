@@ -7,16 +7,13 @@ import sys
 
 
 _DEBUG=False
-
-
-
 parser = argparse.ArgumentParser() 
 parser.add_argument('-d', "--decompress_arg", type=str, help='decompress argument for preprocessing', default='all')
 parser.add_argument('-f', '--filename', type=str, help='filename for preprocessing', default='test.csv')
 parser.add_argument('-s', '--sourcedatadir', type=str, help='source data dir for preprocessing', default='data')
 parser.add_argument('-a', '--averagemode', type=str, help='Average or Min/Max Mode', default='minmax')
 args = parser.parse_args()
-average_mode = args.averamgemode
+average_mode = args.averagemode
 print(args.filename)
 inputFilePath = args.filename
 datadir = args.sourcedatadir
@@ -54,16 +51,19 @@ if __name__ == "__main__":
                 total += 1
                 topFourList[fourCounter] = intMyNum
                 fourCounter += 1
+                # HACK: Messy code, refactor soon
                 if len(topFourList) == 4 and None not in topFourList:
-                    if average_mode:
+                    if average_mode == 'y' or average_mode == 'Y':
                         average = (sum(topFourList)) // len(topFourList)
                         writeTo.writelines([str(average) + '\n'])
+                        fourCounter = 0
+                        topFourList = [None] * 4
                     else:
                         minNum = min(topFourList)
                         maxNum = max(topFourList)
                         writeTo.writelines([str(minNum) + '\n',str(maxNum) + '\n'])
-                     fourCounter = 0
-                     topFourList = [None] * 4
+                        fourCounter = 0
+                        topFourList = [None] * 4
                 if (total % 1_000_000 == 0):
                     print("reached: ", total)
                     toc = time.perf_counter()
