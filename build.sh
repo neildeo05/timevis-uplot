@@ -3,9 +3,13 @@
 
 set -xe
 
+FILENAME="foo.csv"
+
 if [[ "${FORCE}" ]]; then
-    python timevis.py --filename='10m.csv' --force='y' --center_radius_mode='y'
+    
+    python --version
+    python timevis.py --filename=$FILENAME --force='y' --center_radius_mode='y' 
 else
-  python --version
-    python3 timevis.py --filename='10m.csv' --force='n' --center_radius_mode='y'
+    python --version
+    python timevis.py --filename=$FILENAME --force='n' --center_radius_mode='y'
 fi

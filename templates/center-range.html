@@ -1,125 +1,163 @@
-<!--- TODO: Fix Labels --->
-<!--- TODO: Update spans --->
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Timevis</title>
-    <link rel="stylesheet" href="../stylesheets/uPlot.min.css">
-    <link rel="stylesheet" href="../stylesheets/styles.css">
-  </head>
-  <body>
-    <h1> Timevis Center-Radius Mode</h1>
-    <h3 id='foo'>Centering on: </h3>
-    <h3 id='bar'>Current Level: 6</h3>
-    <p> The current level indicates how much much the timeseries has been compressed by. The larger the level, the more coarse the visualization is</p>
-  <script src="../js-scripts/uPlot.iife.js"></script>
-  <script>
 
-    fetch('http://localhost:8000/getAllData', {
-	method: "POST",
-	body: JSON.stringify({plot_type: 'test_all_levels', max_x_values: 10_000_000, level: 6})
-    }).then(res => res.json())
-    .then(json => {
-	const data = json.data
-	console.log(data)
-	const opts = {
-	    width: 1300,
-	    height: 600,
-	    cursor: {
-		drag: {
-		    setScale: false,
-		    x: true,
-		    y: false,
-		}
-	    },
-	    axes: [
-		{
-		    space: 60
-		},
-		{
-		    show: true,
-		    label: "Amplitude",
-		    labelSize: 30,
-		    labelFont: "bold 12px Arial",
-		    font: "12px Arial",
-		    gap: 5,
-		    size: 100,
-		    stroke: "black",
-		    grid: {
-			show: true,
-			stroke: "#eee",
-			width: 2,
-			dash: [],
-		    },
-		    ticks: {
-			show: true,
-			stroke: "#eee",
-			width: 2,
-			dash: [],
-			size: 20,
-		    }
-		}
-	    ],
-	    scales: {
-		x: {
-		    time: false,
-		}
-	    },
-	    series: [
-		{},
-		{
-		    label: "highs",
-		    stroke: "red"
-		},
-		{
-		    label: "lows", 
-		    stroke: "blue"
-		 },
-	    ],
-	    hooks: {
-		init: [
-		    u => {
-			u.over.ondblclick = e => {
-			    console.log("Fetching data for full range");
-			    document.getElementById('bar').innerText = "Current Level: 6";
-			    u.setData(data);
-			}
-		    }
-		],
-		setSelect: [
-		    u => {
-			let min = u.posToVal(u.select.left, 'x');
-			let max = u.posToVal(u.select.left + u.select.width, 'x');
+<head>
+	<title>Timevis</title>
+	<link rel="stylesheet" href="../stylesheets/uPlot.min.css">
+	<link rel="stylesheet" href="../stylesheets/styles.css">
+</head>
 
-			console.log("Fetching data for range...", {min, max});
-			console.log("Centering on..." , Math.floor(Math.ceil(max - min) / 2));
-			document.getElementById('foo').innerText = `Centering on: ${ Math.ceil(min) + Math.floor(Math.floor(Math.ceil(max - min) / 2))}`
+<body>
+	<h1> Timevis Center-Radius Mode</h1>
+	<h3 id='foo'>Centering on: </h3>
+	<h3 id='bar'>Current Level: 6</h3>
+	<h4> In order to reset back to the previous selection, doubleclick on the graph</h4>
+	<p> The current level indicates how much much the timeseries has been compressed by. The larger the level, the more
+		coarse the visualization is</p>
+	<script src="../js-scripts/uPlot.iife.js"></script>
+	<script>
+		let min_maxes = [];
+		let counter = 0;
 
-			fetch('http://localhost:8000/getRange', {
-			    method: "POST",
-			    body: JSON.stringify({plot_type: '', max_x_values: 10_000_000, range_min: min, range_max: max})
-			}).then(res => res.json())
-			    .then(json2 => {
-          if (json2.level == 0) {
-            console.log("IM HERE");
-            console.log(json2.data);
-                u.setData([json2.data[0], json2.data[1], json2.data[1]])
-          }
-          else{
-            u.setData(json2.data);
-                console.log(json2.data);
-          }
-				document.getElementById('bar').innerText = `Current Level: ${json2.level}`;
-			    })
+		fetch('http://localhost:8000/getAllData', {
+			method: "POST",
+			body: JSON.stringify({ plot_type: 'test_all_levels', max_x_values: 10_000_000, level: 6 })
+		}).then(res => res.json())
+			.then(json => {
+				const data = json.data
+				console.log(data)
+				const opts = {
+					width: 1300,
+					height: 600,
+					cursor: {
+						drag: {
+							setScale: false,
+							x: true,
+							y: false,
+						}
+					},
+					axes: [
+						{
+							space: 60
+						},
+						{
+							show: true,
+							label: "Amplitude",
+							labelSize: 30,
+							labelFont: "bold 12px Arial",
+							font: "12px Arial",
+							gap: 5,
+							size: 100,
+							stroke: "black",
+							grid: {
+								show: true,
+								stroke: "#eee",
+								width: 2,
+								dash: [],
+							},
+							ticks: {
+								show: true,
+								stroke: "#eee",
+								width: 2,
+								dash: [],
+								size: 20,
+							}
+						}
+					],
+					scales: {
+						x: {
+							time: false,
+						}
+					},
+					series: [
+						{},
+						{
+							label: "lows",
+							stroke: "blue"
+						},
+						{
+							label: "highs",
+							stroke: "red"
+						},
+					],
+					hooks: {
+						init: [
+							u => {
+								u.over.ondblclick = e => {
+									console.log("Fetching data for full range");
+									document.getElementById('bar').innerText = "Current Level: 6";
+									if ((1 + counter) >= min_maxes.length) {
+										u.setData(data)
+										counter = 0;
+										min_maxes = []
+									}
+									else {
+										last_selection = min_maxes[min_maxes.length - (2 + counter)];
+										counter++;
+										console.log(counter);
+										min = last_selection[0]
+										max = last_selection[1]
+										console.log("Fetching data for range...", { min, max });
+										console.log("Centering on...", Math.floor(Math.ceil(max - min) / 2));
+										document.getElementById('foo').innerText = `Centering on: ${Math.ceil(min) + Math.floor(Math.floor(Math.ceil(max - min) / 2))}`
+										fetch('http://localhost:8000/getRange', {
+											method: "POST",
+											body: JSON.stringify({ plot_type: '', max_x_values: 10_000_000, range_min: min, range_max: max })
+										}).then(res => res.json())
+											.then(json2 => {
+												if (json2.level == 0) {
+													console.log("IM HERE");
+													console.log(json2.data);
+													u.setData([json2.data[0], json2.data[1], json2.data[1]])
+												}
+												else {
+													u.setData([json2.data[0], json2.data[2], json2.data[1]]);
+													console.log(json2.data);
+												}
+												document.getElementById('bar').innerText = `Current Level: ${json2.level}`;
+											})
+										console.log(min_maxes)
+									}
+								}
+							}
+						],
+						setSelect: [
+							u => {
+								let min = u.posToVal(u.select.left, 'x');
+								let max = u.posToVal(u.select.left + u.select.width, 'x');
+								min_maxes.push([min, max])
+								console.log(min_maxes)
 
-			u.setSelect({width: 0, height: 0}, false);
-		    }
-		]
-	    }
-	};
+								console.log("Fetching data for range...", { min, max });
+								console.log("Centering on...", Math.floor(Math.ceil(max - min) / 2));
+								document.getElementById('foo').innerText = `Centering on: ${Math.ceil(min) + Math.floor(Math.floor(Math.ceil(max - min) / 2))}`
 
-	let u = new uPlot(opts, data, document.body);
-    })
-  </script>
+								fetch('http://localhost:8000/getRange', {
+									method: "POST",
+									body: JSON.stringify({ plot_type: '', max_x_values: 10_000_000, range_min: min, range_max: max })
+								}).then(res => res.json())
+									.then(json2 => {
+										if (json2.level == 0) {
+											console.log("IM HERE");
+											console.log(json2.data);
+											u.setData([json2.data[0], json2.data[1], json2.data[1]])
+										}
+										else {
+											u.setData([json2.data[0], json2.data[2], json2.data[1]]);
+											console.log(json2.data);
+										}
+										document.getElementById('bar').innerText = `Current Level: ${json2.level}`;
+									})
+
+								u.setSelect({ width: 0, height: 0 }, false);
+							}
+						]
+					}
+				};
+
+				let u = new uPlot(opts, data, document.body);
+			})
+	</script>
 </body>
+
 </html>
