@@ -7,5 +7,3 @@ PYENV_INSTRUCTIONS
 .python-version
 data/test_preprocessed_levels/
 data/foo_preprocessed_levels/
-foo.csv
-
