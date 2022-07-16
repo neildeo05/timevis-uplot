@@ -4,6 +4,7 @@
 set -xe
 
 FILENAME="foo.csv"
+FORCE=1
 
 if [[ "${FORCE}" ]]; then
     
